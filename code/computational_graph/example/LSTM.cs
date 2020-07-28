@@ -16,7 +16,7 @@ namespace computational_graph.example
         static void Main(string[] args)
         {
             单层();
-            多层lstm();
+           // 多层lstm();
             // lstm.Forward()
         }
 

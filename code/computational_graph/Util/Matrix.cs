@@ -989,17 +989,16 @@ namespace FCN
             for (var i = 0 - p; i <= x - x2 + p; i = i + stride)
             {
                 var ny = 0;
+                if(i>=0)
                 for (var j = 0 - p; j <= y - y2 + p; j = j + stride)
                 {
-                    if (temp.GetLength(0) > nx && temp.GetLength(1) > ny)
+                    if (j>=0)
                         //var sum = 0.0f;
                         for (var i2 = 0; i2 < x2; i2++)
                             for (var j2 = 0; j2 < y2; j2++)
                             {
-                                if (i + i2 < 0 || j + j2 < 0)
-                                    temp[nx, ny] += 0;
-                                else if (i + i2 >= x || j + j2 >= y)
-                                    temp[nx, ny] += 0;
+                                if (i + i2 < 0 || j + j2 < 0 || i + i2 >= x || j + j2 >= y)
+                                { }
                                 else
                                     temp[nx, ny] += matrix[i + i2, j + j2] * kernel[i2, j2];
 
@@ -2392,19 +2391,17 @@ namespace FCN
             for (var i = 0 - p; i <= x - x2 + p; i = i + stride)
             {
                 var ny = 0;
+                if(i>=0)
                 for (var j = 0 - p; j <= y - y2 + p; j = j + stride)
                 {
-                    if (temp.GetLength(0) > nx && temp.GetLength(1) > ny)
-                        //var sum = 0.0f;
+                     if(j>=0) 
                         for (var i2 = 0; i2 < x2; i2++)
                             for (var j2 = 0; j2 < y2; j2++)
                             {
-                                if (i + i2 < 0 || j + j2 < 0)
-                                    temp[nx, ny] += 0;
-                                else if (i + i2 >= x || j + j2 >= y)
-                                    temp[nx, ny] += 0;
-                                else
-                                    temp[nx, ny] += value[i + i2, j + j2] * m[i2, j2];
+                                    if (i + i2 < 0 || j + j2 < 0 || i + i2 >= x || j + j2 >= y)
+                                    { }
+                                    else
+                                        temp[nx, ny] += value[i + i2, j + j2] * m[i2, j2];
 
                             }
                     temp[nx, ny] = (float)(temp[nx, ny]);
