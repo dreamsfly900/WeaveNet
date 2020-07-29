@@ -68,8 +68,10 @@
 #### BP网络运行图
  
 ![BP网络运行图](https://images.gitee.com/uploads/images/2020/0724/113730_f120c0c7_598831.png "bp.png")
-#### CNN网络0.93识别成功率
+#### CNN网络95%识别成功率
 
-![CNN网络0.93识别成功率](https://images.gitee.com/uploads/images/2020/0724/114501_6dc7507c_598831.png "cnn.png")
+ 
+![输入图片说明](https://images.gitee.com/uploads/images/2020/0729/105716_181c6f1e_598831.png "QQ图片20200729105611.png")
+
 #### lstm网络预测PM2.5空气质量
 ![lstm网络预测PM2.5空气质量](https://images.gitee.com/uploads/images/2020/0724/114832_ae812af5_598831.png "lstm.png")
