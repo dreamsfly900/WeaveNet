@@ -407,7 +407,8 @@ namespace computational_graph.Layer
 
                 }
 
-            });
+            }
+            );
             //if (Activfunction != Activfunction.Null)
             //    outputData = ActaLayers.Forward(outputData);
             for (var cc = 0; cc < inputData.Length; cc++)

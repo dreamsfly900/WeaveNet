@@ -1,11 +1,11 @@
-#  WeaveAI
+#  WeaveNet
 
 #### 介绍
 一个使用C#编写的用于神经网络的计算图框架computational graph。带有cnn,bp,fcn,lstm,convlstm等示例。使用方法接进pytorch。
 
 #### 软件架构
  架构完全使用c#编写，可以看到内部任何细节的实现，包含cnn,bp,fcn,lstm,convlstm等示例内容，包含示例所用的数据内容。
-各项功能都在进行或者完事中，欢迎您参与此项事业，可与我联系：QQ群17375149，QQ20573886，emailL:xingyu900@live.com
+各项功能都在进行或者完事中，欢迎您参与此项事业，可与我联系：QQ群17375149，QQ20573886，email:xingyu900@live.com
 
 
 
@@ -65,12 +65,13 @@
                 a++;
             }
 ```
+#### BP网络运行图
+ 
+![BP网络运行图](https://images.gitee.com/uploads/images/2020/0724/113730_f120c0c7_598831.png "bp.png")
+#### CNN网络95%识别成功率
 
-#### 码云特技
+ 
+![输入图片说明](https://images.gitee.com/uploads/images/2020/0729/105716_181c6f1e_598831.png "QQ图片20200729105611.png")
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  码云官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解码云上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是码云最有价值开源项目，是码云综合评定出的优秀开源项目
-5.  码云官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  码云封面人物是一档用来展示码云会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+#### lstm网络预测PM2.5空气质量
+![lstm网络预测PM2.5空气质量](https://images.gitee.com/uploads/images/2020/0724/114832_ae812af5_598831.png "lstm.png")

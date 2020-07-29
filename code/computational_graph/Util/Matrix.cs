@@ -2387,29 +2387,35 @@ namespace FCN
             var col = ((y - y2) + 2 * p) / stride + 1;
             float[,] temp = new float[row, col];
             var nx = 0;
-
+          //  Parallel.For(0 - p, (x - x2 + p)/ stride, cc  =>
             for (var i = 0 - p; i <= x - x2 + p; i = i + stride)
             {
-                var ny = 0;
-                if(i>=0)
-                for (var j = 0 - p; j <= y - y2 + p; j = j + stride)
-                {
-                     if(j>=0) 
-                        for (var i2 = 0; i2 < x2; i2++)
-                            for (var j2 = 0; j2 < y2; j2++)
-                            {
+                //  i = i + stride;
+                //  var ny = 0;
+              // int i = cc * stride;
+                if (i >= 0 && i < x)
+                    for (var j = 0 - p; j <= y - y2 + p; j = j + stride)
+                    {
+                        if (j >= 0 && j < y)
+                        {
+                            for (var i2 = 0; i2 < x2; i2++)
+                                for (var j2 = 0; j2 < y2; j2++)
+                                {
                                     if (i + i2 < 0 || j + j2 < 0 || i + i2 >= x || j + j2 >= y)
-                                    { }
+                                    { continue; }
                                     else
-                                        temp[nx, ny] += value[i + i2, j + j2] * m[i2, j2];
+                                        temp[i, j] += value[i + i2, j + j2] * m[i2, j2];
 
-                            }
-                    temp[nx, ny] = (float)(temp[nx, ny]);
-                    // temp[nx, ny] = Math.Max(ReLU, temp[nx, ny] + bias);
-                    ny++;
-                }
-                nx++;
+                                }
+                            temp[i, j] = (float)(temp[i, j]);
+                        }
+                    }
+                // temp[nx, ny] = Math.Max(ReLU, temp[nx, ny] + bias);
+                // ny++;
+
+                //  nx++;
             }
+           // );
 
             return temp;
         }

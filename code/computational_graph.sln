@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.30114.128
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "computational_graph", "computational_graph\computational_graph.csproj", "{FAD7D210-B5DE-4D39-BC12-39DEC6963922}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GPU测试", "GPU测试\GPU测试.csproj", "{D377C4A8-B9AC-4342-A8D4-7D967B65B782}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{FAD7D210-B5DE-4D39-BC12-39DEC6963922}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FAD7D210-B5DE-4D39-BC12-39DEC6963922}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FAD7D210-B5DE-4D39-BC12-39DEC6963922}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D377C4A8-B9AC-4342-A8D4-7D967B65B782}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D377C4A8-B9AC-4342-A8D4-7D967B65B782}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D377C4A8-B9AC-4342-A8D4-7D967B65B782}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D377C4A8-B9AC-4342-A8D4-7D967B65B782}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
