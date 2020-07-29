@@ -444,7 +444,7 @@ namespace DenseCRF
                 {
                     weights[a][b] = new float[x, y];
                     weights[a][b]=Matrix. randinit(weights[a][b], z+ num);
-                    System.Threading.Thread.Sleep(10);
+                    System.Threading.Thread.Sleep(1);
                     //缺少随机填充初始化
                 }
 

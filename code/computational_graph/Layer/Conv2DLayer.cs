@@ -313,7 +313,7 @@ namespace computational_graph.Layer
 
         dynamic backconvY(float[][][,] grid)
         {
-            int i, j;
+            int i;
             //if (Activfunction != Activfunction.Null)
             //    grid = ActaLayers.Forward(grid);
             // if (grid is float[][][,])
@@ -321,20 +321,23 @@ namespace computational_graph.Layer
                 float[][][,] inputData = grid;
                 float[][][,] outputData = new float[inputData.Length][][,];
                 dynamic outputDataall = null;
-              
-                for (var cc = 0; cc < inputData.Length; cc++)
+
+                // for (var cc = 0; cc < inputData.Length; cc++)
+                Parallel.For(0, inputData.Length, cc =>
                 {
                     outputData[cc] = new float[inChannels][,];
                     for (i = 0; i < (inChannels); i++)
                     {
-                      
-                        for (j = 0; j < (outChannels); j++)
+                        for (int j = 0; j < (outChannels); j++)
+
+                        // Parallel.For(0, outChannels, j =>
+
                         {
                             float[,] v1 = null;
-                              float[,] weight = Matrix.rot180(weights[j][i]);
-                          
+                            float[,] weight = Matrix.rot180(weights[j][i]);
+
                             v1 = Matrix.convnFull(inputData[cc][j], weight, stride, padding);
-                            
+
 
                             if (outputData[cc][i] != null)
                                 outputData[cc][i] = Matrix.MatrixAdd(outputData[cc][i], v1).values;
@@ -346,8 +349,12 @@ namespace computational_graph.Layer
 
                         }
 
+                        //);
+
+
+
                     }
-                  //  outputData = Matrix.divide(outputData, outChannels);
+                    //  outputData = Matrix.divide(outputData, outChannels);
                     if (outputDataall == null)
                         outputDataall = outputData;
                     else
@@ -356,7 +363,7 @@ namespace computational_graph.Layer
                     }
 
 
-                }
+                });
               //  if(inputData.Length>1)
                 outputDataall = Matrix.divide(outputDataall, inputData.Length* outChannels);
                
@@ -366,39 +373,42 @@ namespace computational_graph.Layer
         float[][][,] conv( float[][][,] inputData)
         {
             float[][][,] outputData = new float[inputData.Length][][,];
-            int i, j;
+            int i;
 
 
             //if (Activfunction == Activfunction.Sigmod)
             //{
             //    ActaLayers = new SigmodLayer();
-                
+
             //}
-            for (var cc = 0; cc < inputData.Length; cc++)
+            //   for (var cc = 0; cc < inputData.Length; cc++)
+            Parallel.For(0, inputData.Length, cc =>
             {
                 outputData[cc] = new float[outChannels][,];
-                
+
                 for (i = 0; i < (outChannels); i++)
                 {
 
                     float[,] v1 = null;
-                    for (j = 0; j < (inChannels); j++)
+                    for (int j = 0; j < (inChannels); j++)
+                    // Parallel.For(0, inChannels, j =>
                     {
 
                         float[,] temp;
-                        temp = Matrix.convolution(inputData[cc][j], weights[i][ j], stride, padding);
+                        temp = Matrix.convolution(inputData[cc][j], weights[i][j], stride, padding);
                         if (v1 == null)
                             v1 = new float[temp.GetLength(0), temp.GetLength(1)];
                         v1 = Matrix.MatrixAdd(v1, temp).values;
                         //temp = inputData[j].convolution(C1.weights[j, i].values, C1.stride, C1.padding);//向前传播 
-                      
+                        outputData[cc][i] = v1;
+                        // });
                     }
-
                     //  outputData[cc][i] = Matrix.MatrixAdd(v1, basicData[i]).values;
-                    outputData[cc][i] = v1;
+
                 }
-               
+
             }
+            );
             //if (Activfunction != Activfunction.Null)
             //    outputData = ActaLayers.Forward(outputData);
             for (var cc = 0; cc < inputData.Length; cc++)
