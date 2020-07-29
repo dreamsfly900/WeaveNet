@@ -35,7 +35,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>computational_graph.example.CNNtest</StartupObject>
+    <StartupObject>computational_graph.example.GRUtest</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -55,7 +55,8 @@
     <Compile Include="example\BP.cs" />
     <Compile Include="example\ConvLSTM.cs" />
     <Compile Include="example\FCN.cs" />
-    <Compile Include="example\LSTM.cs" />
+    <Compile Include="example\GRU.cs" />
+    <Compile Include="example\LSTM.-RNN.cs" />
     <Compile Include="example\CNN.cs" />
     <Compile Include="example\交叉损失函数测试.cs" />
     <Compile Include="Layer\Dropout.cs" />

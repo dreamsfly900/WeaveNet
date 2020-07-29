@@ -24,20 +24,22 @@ namespace computational_graph.example
             datah[0] = new float[10][,];
             datac[0] = new float[10][,];
             datay[0] = new float[10][,];
-            for (int t = 0; t < 10; t++)
-            {
-                string file = files[t];
-                float[,] anno1 = DenseCRF.util.readRADARMatrix(file);
-                datax[0][t] = anno1;
-                datah[0][t] =new float[anno1.GetLength(0), anno1.GetLength(1)];
-                datac[0][t] = new float[anno1.GetLength(0), anno1.GetLength(1)];
-                file = files[t+10];
-                datay[0][t] = DenseCRF.util.readRADARMatrix(file);
-            }
             MSELoss mloss = new MSELoss();
             ConvLSTM convLSTM = new ConvLSTM(10, 10, 5);
-            for (int t = 0; t < 10; t++)
+            for (int r = 0; r < files.Length-10; r++)
             {
+                for (int t = 0; t < 10; t++)
+                {
+                    string file = files[r+t];
+                    float[,] anno1 = DenseCRF.util.readRADARMatrix(file);
+                    datax[0][t] = anno1;
+                    datah[0][t] = new float[anno1.GetLength(0), anno1.GetLength(1)];
+                    datac[0][t] = new float[anno1.GetLength(0), anno1.GetLength(1)];
+                    file = files[r+t + 10];
+                    datay[0][t] = DenseCRF.util.readRADARMatrix(file);
+                }
+
+
                 var (h_next, c_next) = convLSTM.Forward(datax, datah, datac);
                 var loss = mloss.Forward(h_next, datay);
                 Console.WriteLine("误差:" + loss);

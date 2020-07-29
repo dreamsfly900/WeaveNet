@@ -1298,6 +1298,23 @@ namespace FCN
             }
             return mc;
         }
+        public static float[][] MatrixSub(float ma, float[][] mb)
+        {
+
+            int m = mb.GetLength(0);
+            int n = mb[0].GetLength(0);
+            float[][] mc = new float[m][];
+            for (int i = 0; i < m; i++)
+            {
+                mc[i] = new float[n];
+                for (int j = 0; j < n; j++)
+                {
+                    float output_value = mb[i][j];
+                    mc[i][j] = (ma - output_value);
+                }
+            }
+            return mc;
+        }
         public static float[][][,] MatrixSub(float[][][,] ma, float[][][,] mb)
         {
 
@@ -1314,6 +1331,7 @@ namespace FCN
             }
             return mc;
         }
+
         public static Matrix MatrixSub(Matrix ma, Matrix mb)
         {
              

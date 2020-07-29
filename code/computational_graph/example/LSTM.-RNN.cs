@@ -15,8 +15,8 @@ namespace computational_graph.example
     {
         static void Main(string[] args)
         {
-            单层();
-           // 多层lstm();
+            //单层();
+            多层lstm();//多层LSTM 相当于RNN
             // lstm.Forward()
         }
 
