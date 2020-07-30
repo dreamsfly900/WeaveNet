@@ -225,7 +225,7 @@ namespace computational_graph.Layer
             //}
             int Channels = grid.Length;
             float[][][,] ddata = new float[Channels][][,];
-            float[][] grid2 = new float[Channels][];
+          //  float[][] grid2 = new float[Channels][];
             for (int g = 0; g < Channels; g++) {
                 float[][,] d = new float[inChannels][,];
                
@@ -257,7 +257,8 @@ namespace computational_graph.Layer
                 float[][][,] inputData = grid;
 
                 dynamic outputDataall = null;
-                for (var cc = 0; cc < inputData.Length; cc++)
+                Parallel.For(0, inputData.Length, cc =>
+                //  for (var cc = 0; cc < inputData.Length; cc++)
                 {
                     float[][][,] outputData = new float[outChannels][][,];
                     for (i = 0; i < (outChannels); i++)
@@ -278,9 +279,10 @@ namespace computational_graph.Layer
                             // Matrix.MatrixAdd(outputData[i][j], basicData[i]);
 
                         }
- 
+
                     }
-                   // outputData = Matrix.divide(outputData, outChannels);
+
+                    // outputData = Matrix.divide(outputData, outChannels);
                     if (outputDataall == null)
                         outputDataall = outputData;
                     else
@@ -290,6 +292,7 @@ namespace computational_graph.Layer
 
 
                 }
+                 );
                 outputDataall = Matrix.divide(outputDataall, inputData.Length* outChannels);
                 float[] outputB = new float[outChannels];
 

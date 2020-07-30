@@ -12,8 +12,78 @@ namespace computational_graph.example
 {
     public class GRUtest
     {
-        static void Main(string[] args)
+        static unsafe void Main(string[] args)
         {
+            
+            //var star = DateTime.Now;
+            //int ss = 0;
+            //while (ss < 10)
+            //{
+            //    float[,] temp = new float[2,2];
+
+            //    float[,] temp2 = new float[2, 2];
+            //    fixed (float* arr = &temp[0,0]) 
+            //    {
+            //        for (int i = 0; i < 2* 2; i++)
+            //        {
+            //            *(arr + i) = i;
+            //            //for (int j = 0; j <= 2; j++)
+            //            //     *(&(*(arr + i))+j) = i+j;
+            //        }
+
+
+
+            //    }
+            //    fixed (float* arr = &temp[0, 0])
+            //    {
+            //        for (int i = 0; i < 2 ; i++)
+            //        {
+
+            //            for (int j = 0; j < 2; j++)
+            //            {
+            //                temp2[i,j] = *(arr + j + (i * 2));
+            //            }
+            //            //     *(&(*(arr + i))+j) = i+j;
+            //        }
+
+
+
+            //    }
+
+            //    //for (int i = 0; i < 9000; i++)
+            //    //{
+            //    //    for (int j = 0; j < 9000; j++)
+            //    //    {
+            //    //        float f = 0.1f;
+            //    //        arr[i, j] = &f;
+
+            //    //    }
+            //    //}
+            //    // System.Runtime.InteropServices.Marshal.ReleaseComObject(arr);
+
+            //    ss++;
+            //}
+            //var end = DateTime.Now;
+            //Console.WriteLine((end- star).TotalMilliseconds);
+
+            //star = DateTime.Now;
+            // ss = 0;
+            //while (ss < 10)
+            //{
+            //    float[,] arr2 = new float[9000, 9000];
+            //    for (int i = 0; i < 9000; i++)
+            //    {
+            //        for (int j = 0; j < 9000; j++)
+            //        {
+
+            //            arr2[i, j] = 0.1f;
+
+            //        }
+            //    }
+            //    ss++;
+            //}
+            // end = DateTime.Now;
+            //Console.WriteLine((end - star).TotalMilliseconds);
             单层();
             // 多层lstm();//多层LSTM 相当于RNN
             // lstm.Forward()

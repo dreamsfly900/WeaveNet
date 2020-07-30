@@ -76,7 +76,6 @@ namespace computational_graph.example
                     surss++;
 
 
-
                 } else
                     shibai++;
                    
