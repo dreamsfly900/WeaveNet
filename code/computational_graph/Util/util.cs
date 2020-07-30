@@ -148,20 +148,20 @@ namespace DenseCRF
             image.Dispose();
             return GreyImage;
         }
-        public static Matrix[,] convolutions(Matrix[] Tmap, Matrix[,] weights, int stride)
-        {
-            var channl = Tmap.Length;
-            var num = weights.GetLength(1);
-            Matrix[,] map = new Matrix[channl, num];
-            for (var k = 0; k < channl; k++)
-            {
-                for (var k2 = 0; k2 < num; k2++)
-                {
-                    map[k, k2] = util.corr2d(Tmap[k], weights[k, k2], stride, 0.0f);
-                }
-            }
-            return map;
-        }
+        //public static Matrix[,] convolutions(Matrix[] Tmap, Matrix[,] weights, int stride)
+        //{
+        //    var channl = Tmap.Length;
+        //    var num = weights.GetLength(1);
+        //    Matrix[,] map = new Matrix[channl, num];
+        //    for (var k = 0; k < channl; k++)
+        //    {
+        //        for (var k2 = 0; k2 < num; k2++)
+        //        {
+        //            map[k, k2] = util.corr2d(Tmap[k], weights[k, k2], stride, 0.0f);
+        //        }
+        //    }
+        //    return map;
+        //}
         static int  converRgbToArgb(byte r, byte g, byte b)
         {
             var color = ((0xFF << 24) | (r << 16) | (g << 8) | b);
@@ -452,16 +452,16 @@ namespace DenseCRF
             return weights;
 
         }
-        public static float[,] corr2d(float[,] mx, float[,] m, int stride,float relu)
-        {
-            Matrix max = new Matrix();
-            max.values = mx;
-            return max.convolution(m, stride, relu,0);
-        }
-        public static Matrix corr2d(Matrix mx,Matrix m,int stride, float relu)
-        {
-            return mx.convolution(m, stride, relu);
-        }
+        //public static float[,] corr2d(float[,] mx, float[,] m, int stride,float relu)
+        //{
+        //    Matrix max = new Matrix();
+        //    max.values = mx;
+        //    return max.convolution(m, stride, relu,0);
+        //}
+        //public static Matrix corr2d(Matrix mx,Matrix m,int stride, float relu)
+        //{
+        //    return mx.convolution(m, stride, relu);
+        //}
         static double GT_PROB = 0.5;
         public static float[,,] classify(float[,,] anno, int M)
         {

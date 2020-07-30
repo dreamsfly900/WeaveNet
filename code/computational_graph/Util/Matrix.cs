@@ -424,58 +424,8 @@ namespace FCN
             return data;
         }
 
-        public static float[,] convnFCN(float[,] matrix, float[,] kernel, int stride, int p)
-        {
-            int m = matrix.GetLength(0);
-            int n = matrix.GetLength(1);
-            int km = kernel.GetLength(0);
-            int kn = kernel.GetLength(1);
-            float[,] extendMatrix = new float[(m * stride) + (2 - p) * (km - 1), (n * stride) + (2 - p) * (kn - 1)];
-            int m2 = extendMatrix.GetLength(0);
-            int n2 = extendMatrix.GetLength(1);
-            int s = 0, h = 0;
-                for (int i = 0; i < m2; i += stride)
-                {
-
-                    h = 0;
-                    for (int j = 0; j < n2; j += stride)
-                    {
-
-                        extendMatrix[i, j ] = matrix[s, h];
-                        h++;
-                    }
-                    s++;
-                }
-           
-
-
-            return convnValid(extendMatrix, kernel, 1, p);
-        }
-        internal static Matrix[] cat(Matrix[] input, Matrix[] prev_state)
-        {
-            Matrix[] temp = null;
          
-                temp = new Matrix[input.GetLength(0) + prev_state.GetLength(0)];
-          
-                int y = input.GetLength(0) + prev_state.GetLength(0);
-               
-                    for (int j = 0; j < y - prev_state.GetLength(0); j++)
-                    {
-                        temp[ j] = input[ j];
-                    }
-                
-              
-                    for (int j = y - prev_state.GetLength(0); j < y; j++)
-                    {
-                        temp[ j] = prev_state[j - (y - prev_state.GetLength(0))];
-                    }
-                
-
-            
-
-            return temp;
-
-        }
+      
         internal static Matrix[,] cat(Matrix[,] input, Matrix[,] prev_state,int  index)
         {
             Matrix[,] temp=null;
@@ -658,7 +608,7 @@ namespace FCN
             }
             return temp;
         }
-        public static Matrix activation_tanh(float[,] Ma, float bias = 0)
+        public unsafe static Matrix activation_tanh(float[,] Ma, float bias = 0)
         {
             int m = Ma.GetLength(0);
             int n = Ma.GetLength(1);
@@ -666,12 +616,15 @@ namespace FCN
 
             Matrix Mc = new Matrix(m, n);
             float[,] c = Mc.values;
-            float[,] a = Ma;
+           
 
-
-            for (int i = 0; i < m; i++)
-                for (int j = 0; j < n; j++)
-                    c[i, j] = Tanh(a[i, j] + bias);
+            fixed (float* arr = &Ma[0, 0])
+            {
+                for (int i = 0; i < m; i++)
+                    for (int j = 0; j < n; j++)
+                        c[i, j] = Tanh(*(arr + j + (i * m))  + bias);
+                //c[i, j] = Tanh(a[i, j] + bias);
+            }
             return Mc;
         }
 
@@ -934,21 +887,28 @@ namespace FCN
             }
             return temp;
         }
-        internal static float sum(float[,] matrix)
+        internal unsafe static float sum(float[,] matrix)
         {
             float temp = 0;
-            for (var x = 0; x < matrix.GetLength(0); x++)
+            int m = matrix.GetLength(0);
+            int n = matrix.GetLength(1);
+            fixed (float* arr = &matrix[0, 0])
             {
-                for (var y = 0; y < matrix.GetLength(1); y++)
+                for (var x = 0; x <m; x++)
                 {
+                    for (var y = 0; y < n; y++)
+                    {
 
-                    temp += matrix[x, y];
+                        temp += *(arr + y + (x * m));//  matrix[x, y];
+                    }
                 }
             }
             return temp;
         }
         public static float[,] convnValid(float[,] matrix, float[,] kernel, int stride,int p)
         {
+
+            return Conv(matrix, kernel, stride, p);
             //		kernel = rot180(kernel);
             //int m = matrix.GetLength(0);
             //int n = matrix.GetLength(1);
@@ -1581,8 +1541,9 @@ namespace FCN
                     c[i, j] =Math.Max( a[i, j] ,b[i, j]) ;
             return Mc;
         }
-        public static Matrix MatrixAdd(float[,] Ma, float[,] Mb,float bias=0)
+        public unsafe static Matrix MatrixAdd(float[,] Ma, float[,] Mb,float bias=0)
         {
+           
             int m = Ma.GetLength(0);
             int n = Ma.GetLength(1);
             int m2 = Mb.GetLength(0);
@@ -1596,15 +1557,20 @@ namespace FCN
 
             Matrix Mc = new Matrix(m, n);
             float[,] c = Mc.values;
-            float[,] a = Ma;
-            float[,] b = Mb;
-
-            for (int i = 0; i < m; i++)
-                for (int j = 0; j < n; j++)
-                    c[i, j] =(float) a[i, j] + b[i, j]+ bias;
+            //float[,] a = Ma;
+            //float[,] b = Mb;
+            fixed (float* marr = &Ma[0, 0])
+            {
+                fixed (float* mbrr = &Mb[0, 0])
+                {
+                    for (int i = 0; i < m; i++)
+                        for (int j = 0; j < n; j++)
+                            c[i, j] = *(marr+j+(i*m)) + (*(mbrr + j + (i * m))) + bias;
+                }
+            }
             return Mc;
         }
-        public static Matrix MatrixAdd(float[,] Ma, float bias = 0)
+        public unsafe static Matrix MatrixAdd(float[,] Ma, float bias = 0)
         {
             int m = Ma.GetLength(0);
             int n = Ma.GetLength(1);
@@ -1612,12 +1578,19 @@ namespace FCN
 
             Matrix Mc = new Matrix(m, n);
             float[,] c = Mc.values;
-            float[,] a = Ma;
-          
+            
 
-            for (int i = 0; i < m; i++)
-                for (int j = 0; j < n; j++)
-                    c[i, j] = a[i, j] + bias;
+            fixed (float* marr = &Ma[0, 0])
+            {
+                
+                    for (int i = 0; i < m; i++)
+                        for (int j = 0; j < n; j++)
+                            c[i, j] = *(marr + j + (i * m))  + bias;
+                
+            }
+            //for (int i = 0; i < m; i++)
+            //    for (int j = 0; j < n; j++)
+            //        c[i, j] = a[i, j] + bias;
             return Mc;
         }
 
@@ -1637,7 +1610,7 @@ namespace FCN
                     c[i, j] = Math.Max(a[i, j] + bias, relu);
             return Mc;
         }
-        public static Matrix activation_Sigma(float[,] Ma, float bias = 0)
+        public unsafe static Matrix activation_Sigma(float[,] Ma, float bias = 0)
         {
             int m = Ma.GetLength(0);
             int n = Ma.GetLength(1);
@@ -1645,12 +1618,14 @@ namespace FCN
 
             Matrix Mc = new Matrix(m, n);
             float[,] c = Mc.values;
-            float[,] a = Ma;
-        
+           // float[,] a = Ma;
 
-            for (int i = 0; i < m; i++)
-                for (int j = 0; j < n; j++)
-                    c[i, j] = sigmod(a[i,j] + bias);
+            fixed (float* arr = &Ma[0, 0])
+            {
+                for (int i = 0; i < m; i++)
+                    for (int j = 0; j < n; j++)
+                        c[i, j] = sigmod(*(arr + j + (i * m))  + bias);
+            }
             return Mc;
         }
         internal static Matrix[,] activation_Sigmabackward(Matrix[,] input, Matrix[,] dout)
@@ -1695,7 +1670,7 @@ namespace FCN
             }
             return temp;
         }
-        public static Matrix activation_Sigmabackward(float[,] Ma,float [,] dout)
+        public unsafe static Matrix activation_Sigmabackward(float[,] Ma,float [,] dout)
         {
             int m = Ma.GetLength(0);
             int n = Ma.GetLength(1);
@@ -1705,10 +1680,16 @@ namespace FCN
             float[,] c = Mc.values;
             float[,] a = Ma;
 
-
-            for (int i = 0; i < m; i++)
-                for (int j = 0; j < n; j++)
-                    c[i, j] = dout[i,j]*(1-a[i, j])*a[i, j];// dout * (1 - outdata) * outdata;
+            fixed (float* arr = &Ma[0, 0])
+            {
+                fixed (float* doutrr = &dout[0, 0])
+                {
+                    for (int i = 0; i < m; i++)
+                        for (int j = 0; j < n; j++)
+                            c[i, j] = *(doutrr + j + (i * m)) * (1 - *(arr + j + (i * m))  ) * *(arr + j + (i * m));
+                    // c[i, j] = dout[i, j] * (1 - a[i, j]) * a[i, j];// dout * (1 - outdata) * outdata;
+                }
+            }
             return Mc;
         }
         public static float[][]  activation_Sigmabackward(float[][] Ma, float[][] dout)
@@ -1841,7 +1822,7 @@ namespace FCN
 
             return temp;
         }
-        public static Matrix activation_tanhbackward(float[,] Ma, float[,] dout)
+        public unsafe static Matrix activation_tanhbackward(float[,] Ma, float[,] dout)
         {
             int m = Ma.GetLength(0);
             int n = Ma.GetLength(1);
@@ -1851,16 +1832,23 @@ namespace FCN
 
             Matrix Mc = new Matrix(m2, n2);
             float[,] c = Mc.values;
-          
 
-            for (int i2 = 0; i2 < m2; i2++)
-                for (int j2 = 0; j2 < n2; j2++)
+            fixed (float* arr = &Ma[0, 0])
+            {
+                fixed (float* doutrr = &dout[0, 0])
                 {
-                    
-                    c[i2, j2]=(float)(dout[i2, j2] * (1.0 - Math.Pow(Ma[i2, j2], 2))); //dout[i, j] * (1 - a[i, j]) * a[i, j];// dout * (1 - outdata) * outdata;
+                    for (int i2 = 0; i2 < m2; i2++)
+                        for (int j2 = 0; j2 < n2; j2++)
+                        {
 
-                  
+                            c[i2, j2] = (float)(*(doutrr+j2+(i2*m2))  * (1.0 - Math.Pow(*(arr + j2 + (i2 * m2)), 2))); 
+                            //dout[i, j] * (1 - a[i, j]) * a[i, j];// dout * (1 - outdata) * outdata;
+
+
+                        }
                 }
+            }
+
             return Mc;
         }
       
@@ -1869,6 +1857,7 @@ namespace FCN
         {
             int hang = a.GetLength(0);
             int lie = a.GetLength(1);
+
             for (int i = 0; i < hang; i++)
             {
                 for (int j = 0; j < lie; j++)
@@ -1895,16 +1884,19 @@ namespace FCN
             }
             return result;
         }
-        public static float[,] divide(float[,] a, float b)
+        public unsafe static float[,] divide(float[,] a, float b)
         {
             int hang = a.GetLength(0);
             int lie = a.GetLength(1);
             float[,] result = new float[hang, lie];
-            for (int i = 0; i < hang; i++)
+            fixed (float* arr = &a[0, 0])
             {
-                for (int j = 0; j < lie; j++)
+                for (int i = 0; i < hang; i++)
                 {
-                    result[i, j] = a[i, j] / b;
+                    for (int j = 0; j < lie; j++)
+                    {
+                        result[i, j] = *(arr + j + (i * hang))   / b;
+                    }
                 }
             }
             return result;
@@ -1996,28 +1988,28 @@ namespace FCN
                 }
             return bvalue;
         }
-        public Matrix convolution(Matrix m,int stride,float ReLU)
-        {
-            Matrix ma = new Matrix();
+        //public Matrix convolution(Matrix m,int stride,float ReLU)
+        //{
+        //    Matrix ma = new Matrix();
            
-            ma.values = convolution(m.values, stride, ReLU,0);
-            return ma;
-        }
+        //    ma.values = convolution(m.values, stride, ReLU,0);
+        //    return ma;
+        //}
 
-        public Matrix convolution(Matrix m, int stride, float ReLU,float bias)
-        {
-            Matrix ma = new Matrix();
+        //public Matrix convolution(Matrix m, int stride, float ReLU,float bias)
+        //{
+        //    Matrix ma = new Matrix();
 
-            ma.values = convolution(m.values, stride, ReLU, bias);
-            return ma;
-        }
-        public Matrix convolution(Matrix m, int stride, float ReLU, float bias,int p)
-        {
-            Matrix ma = new Matrix();
+        //    ma.values = convolution(m.values, stride, ReLU, bias);
+        //    return ma;
+        //}
+        //public Matrix convolution(Matrix m, int stride, float ReLU, float bias,int p)
+        //{
+        //    Matrix ma = new Matrix();
 
-            ma.values = convolution(m.values, stride, ReLU, bias,p);
-            return ma;
-        }
+        //    ma.values = convolution(m.values, stride, ReLU, bias,p);
+        //    return ma;
+        //}
         public static Matrix[,] MatrixAdd(Matrix[,] Ma, Matrix[,] Mb)
         {
             Matrix[,] input = new Matrix[Ma.GetLength(0), Ma.GetLength(1)];
@@ -2232,7 +2224,7 @@ namespace FCN
             return Mc;
 
         }
-        public static float[,] multiply(float[,] Ma, float Mb)
+        public unsafe static float[,] multiply(float[,] Ma, float Mb)
 
         {
 
@@ -2241,19 +2233,18 @@ namespace FCN
             
 
           
-            Matrix Mc = new Matrix(m, n);
-            float[,] c = Mc.values;
-
-
-            for (int i = 0; i < m; i++)
-                for (int j = 0; j < n; j++)
-                {
-                    float a = Ma[i, j];
-
-                    float b = Mb;
-                    c[i, j] = (float)a * b;
-                }
-            return Mc.values;
+             
+            float[,] c = new float[m, n];
+            fixed (float* maarr = &Ma[0, 0])
+            {
+                for (int i = 0; i < m; i++)
+                    for (int j = 0; j < n; j++)
+                    {
+                         
+                        c[i, j] = *(maarr + (i * m) + j) * Mb;
+                    }
+            }
+            return c;
 
         }
         /// <summary>
@@ -2266,7 +2257,7 @@ namespace FCN
 
         /// <returns>积</returns>
 
-        public static  float[,] multiply(float[,] Ma, float[,] Mb)
+        public unsafe static  float[,] multiply(float[,] Ma, float[,] Mb)
 
         {
 
@@ -2281,120 +2272,85 @@ namespace FCN
                 throw myException;
             }
 
-            Matrix Mc = new Matrix(m, n);
-            float[,] c = Mc.values;
+            //Matrix Mc = new Matrix(m, n);
+            float[,] c = new float[m,n];
 
-
-            for (int i = 0; i < m; i++)
-                for (int j = 0; j < n; j++)
+            fixed (float* maarr = &Ma[0, 0])
+            {
+                fixed (float* Mbarr = &Mb[0, 0])
                 {
-                    float a = Ma[i, j];
+                    for (int i = 0; i < m; i++)
+                        for (int j = 0; j < n; j++)
+                        {
+                            //float a = Ma[i, j];
 
-                    float b =   Mb[i, j];
-                    c[i, j] =(float)a * b;
+                            //float b = Mb[i, j];
+                            //c[i, j] = (float)a * b;
+                            c[i, j] = *(maarr + (i * m) + j) * *(Mbarr + (i * m) + j);
+                        }
                 }
-            return Mc.values;
+            }
+            return c;
 
         }
-
-        public static float[,] multiply_lambda_alpha(float[,] Ma, float[,] Mb, float alpha, float LAMBDA)
-
+ 
+        public unsafe static float[,] Conv(float[,] value, float[,] m, int stride, int padding = 0)
         {
-            int m = Ma.GetLength(0);
-            int n = Ma.GetLength(1);
-            int m2 = Mb.GetLength(0);
-            int n2 = Mb.GetLength(1);
-
-            if ((m != m2) || (n != n2))
+            var x = value.GetLength(0);
+            var y = value.GetLength(1);
+            var x2 = m.GetLength(0);
+            var y2 = m.GetLength(1);
+            var p = padding;
+            //Ho=(H−F+2×P)/S+1
+            var row = ((x - x2) + 2 * p) / stride + 1;
+            var col = ((y - y2) + 2 * p) / stride + 1;
+            float[,] temp = new float[row, col];
+          //  fixed (float* temparr = &temp[0, 0])
             {
-                Exception myException = new Exception("数组维数不匹配");
-                throw myException;
-            }
-
-            Matrix Mc = new Matrix(m, n);
-            float[,] c = Mc.values;
-           
-
-            for (int i = 0; i < m; i++)
-                for (int j = 0; j < n; j++)
+                fixed (float* marr = &m[0, 0])
                 {
-                    float a = Ma[i, j];
-                    a = a * (1 - LAMBDA * alpha);
-                    float b = Mb[i, j] * alpha;
-                    c[i, j] = a+ b;
+                    fixed (float* arr = &value[0, 0])
+                    {
+                        for (var i = 0 - p; i <= x - x2 + p; i = i + stride)
+                        {
+                            //  i = i + stride;
+                            //  var ny = 0;
+                            // int i = cc * stride;
+                            if (i >= 0 && i < x)
+                                for (var j = 0 - p; j <= y - y2 + p; j = j + stride)
+                                {
+                                    if (j >= 0 && j < y)
+                                    {
+                                        for (var i2 = 0; i2 < x2; i2++)
+                                            for (var j2 = 0; j2 < y2; j2++)
+                                            {
+                                                if (i + i2 < 0 || j + j2 < 0 || i + i2 >= x || j + j2 >= y)
+                                                { continue; }
+                                                else
+                                                {
+                                                    // float bb = (*(arr + (j + (i * x)) + i2 + j2)) * (*(marr + j2 + (i2 * x2)));
+                                                    temp[i, j] += (*(arr + (j + ((i + i2) * x)) + j2)) * (*(marr + j2 + (i2 * x2)));
+                                                    //   * (temparr + (j + (i * x))) += (*(arr + (j + ((i + i2) * x)) + j2)) * (*(marr + j2 + (i2 * x2)));
+                                                    // temp[i, j] += value[i + i2, j + j2] * m[i2, j2];
+                                                }
+                                            }
+                                        // temp[i, j] = (float)(temp[i, j]);
+                                    }
+                                }
+                            // temp[nx, ny] = Math.Max(ReLU, temp[nx, ny] + bias);
+                            // ny++;
+
+                            //  nx++;
+                        }
+
+                    }
                 }
-            return Mc.values;
-            //matrix1是m*n矩阵，matrix2是n*p矩阵，则result是m*p矩阵
-
-            
-
-        }
-        public static float[,] multiply_alpha(float[,] Ma, float[,] Mb, float alpha)
-
-        {
-            int m = Ma.GetLength(0);
-            int n = Ma.GetLength(1);
-            int m2 = Mb.GetLength(0);
-            int n2 = Mb.GetLength(1);
-
-            if ((m != m2) || (n != n2))
-            {
-                Exception myException = new Exception("数组维数不匹配");
-                throw myException;
             }
-
-            Matrix Mc = new Matrix(m, n);
-            float[,] c = Mc.values;
-
-
-            for (int i = 0; i < m; i++)
-                for (int j = 0; j < n; j++)
-                {
-                    c[i, j] = Ma[i, j];
-                    float delta_w = alpha * Ma[i, j] * Mb[i, j];
-                     
-                 //   a = a *  alpha;
-                  
-                    c[i, j]+= delta_w;
-                }
-            return Mc.values;
-            //matrix1是m*n矩阵，matrix2是n*p矩阵，则result是m*p矩阵
-
-
-
-        }
-        public static float[,] onevalueAndmultiply(float[,] Ma, float[,] Mb)
-
-        {
-            int m = Ma.GetLength(0);
-            int n = Ma.GetLength(1);
-            int m2 = Mb.GetLength(0);
-            int n2 = Mb.GetLength(1);
-
-            if ((m != m2) || (n != n2))
-            {
-                Exception myException = new Exception("数组维数不匹配");
-                throw myException;
-            }
-
-            Matrix Mc = new Matrix(m, n);
-            float[,] c = Mc.values;
-
-
-            for (int i = 0; i < m; i++)
-                for (int j = 0; j < n; j++)
-                {
-                    float a = Ma[i, j];
-                 
-                    float b = 1 - Mb[i, j];
-                    c[i, j] = a * b;
-                }
-            return Mc.values;
-             
+            return temp;
         }
         public static float[,] convolution(float[,] value, float[,] m, int stride, int padding = 0)
         {
-
+            return Conv(value, m, stride, padding);
             var x = value.GetLength(0);
             var y = value.GetLength(1);
             var x2 = m.GetLength(0);
@@ -2437,87 +2393,7 @@ namespace FCN
 
             return temp;
         }
-        public float[,] convolution(float[,] m, int stride, int padding = 0)
-        {
-
-            var x = values.GetLength(0);
-            var y = values.GetLength(1);
-            var x2 = m.GetLength(0);
-            var y2 = m.GetLength(1);
-            var p = padding;
-            //Ho=(H−F+2×P)/S+1
-            var row = ((x - x2) + 2 * p) / stride + 1;
-            var col = ((y - y2) + 2 * p) / stride + 1;
-            float[,] temp = new float[row, col];
-            var nx = 0;
-
-            for (var i = 0 - p; i <= x - x2 + p; i = i + stride)
-            {
-                var ny = 0;
-                for (var j = 0 - p; j <= y - y2 + p; j = j + stride)
-                {
-                    if (temp.GetLength(0) > nx && temp.GetLength(1) > ny)
-                        //var sum = 0.0f;
-                        for (var i2 = 0; i2 < x2; i2++)
-                            for (var j2 = 0; j2 < y2; j2++)
-                            {
-                                if (i + i2 < 0 || j + j2 < 0)
-                                    temp[nx, ny] += 0;
-                                else if (i + i2 >= x || j + j2 >= y)
-                                    temp[nx, ny] += 0;
-                                else
-                                    temp[nx, ny] +=values[i + i2, j + j2] * m[i2, j2];
-
-                            }
-                    temp[nx, ny] =(float)(temp[nx, ny]);
-                    // temp[nx, ny] = Math.Max(ReLU, temp[nx, ny] + bias);
-                    ny++;
-                }
-                nx++;
-            }
-
-            return temp;
-        }
-        public  float[,] convolution(float[,] m, int stride,float ReLU,float bias, int padding=0)
-        {
-            
-            var x = values.GetLength(0);
-            var y = values.GetLength(1);
-            var x2 = m.GetLength(0);
-            var y2 = m.GetLength(1);
-            var p = padding;
-            //Ho=(H−F+2×P)/S+1
-            var row = ((x - x2)+2* p) / stride+1;
-            var col = ((y - y2)+2* p) / stride+1;
-            float[,] temp = new float[row, col];
-            var nx = 0;
-           
-            for (var i = 0- p; i <= x-x2+ p; i = i + stride)
-            {
-                var  ny = 0;
-                for (var j =0- p; j <= y-y2+ p; j = j + stride)
-                {
-                   if(temp.GetLength(0)> nx && temp.GetLength(1)> ny)
-                    //var sum = 0.0f;
-                    for (var i2 = 0; i2 < x2; i2++)
-                        for (var j2 = 0; j2 < y2; j2++)
-                        {
-                                if (i + i2 < 0 || j + j2 < 0)
-                                    temp[nx, ny] += 0;
-                                else if (i + i2 >= x || j + j2 >= y)
-                                    temp[nx, ny] += 0;
-                                else
-                                  temp[nx, ny] += values[i + i2, j + j2] * m[i2, j2];
-
-                        }
-                    temp[nx, ny] = Math.Max(ReLU, temp[nx, ny]+ bias);
-                    ny++;
-                }
-                nx++;
-            }
-        
-            return temp;
-        }
+         
         public static Matrix[,] Clip(Matrix[,] grads)
         {
             for (var x = 0; x < grads.GetLength(0); x++)
@@ -2548,47 +2424,6 @@ namespace FCN
             if (x > 1.0) return 1.0f;
             return x;
         }
-        public float[,] convolutionsigmod(float[,] m, int stride, float bias, int padding = 0)
-        {
-
-            var x = values.GetLength(0);
-            var y = values.GetLength(1);
-            var x2 = m.GetLength(0);
-            var y2 = m.GetLength(1);
-            var p = padding;
-            //Ho=(H−F+2×P)/S+1
-            var row = ((x - x2) + 2 * p) / stride + 1;
-            var col = ((y - y2) + 2 * p) / stride + 1;
-            float[,] temp = new float[row, col];
-            var nx = 0;
-
-            for (var i = 0 - p; i <= x - x2 + p; i = i + stride)
-            {
-                var ny = 0;
-                for (var j = 0 - p; j <= y - y2 + p; j = j + stride)
-                {
-                    if (temp.GetLength(0) > nx && temp.GetLength(1) > ny)
-                        //var sum = 0.0f;
-                        for (var i2 = 0; i2 < x2; i2++)
-                            for (var j2 = 0; j2 < y2; j2++)
-                            {
-                                if (i + i2 < 0 || j + j2 < 0)
-                                    temp[nx, ny] += 0;
-                                else if (i + i2 >= x || j + j2 >= y)
-                                    temp[nx, ny] += 0;
-                                else
-                                    temp[nx, ny] += values[i + i2, j + j2] * m[i2, j2];
-
-                            }
-                //    if(temp[nx, ny]!=0)
-                    temp[nx, ny] =(float)sigmod( temp[nx, ny] + bias);
-                    ny++;
-                }
-                nx++;
-            }
-
-            return temp;
-        }
-
+        
     }
 }

@@ -39,13 +39,15 @@ namespace computational_graph.example
                     datay[0][t] = DenseCRF.util.readRADARMatrix(file);
                 }
 
-
+                var star = DateTime.Now;
                 var (h_next, c_next) = convLSTM.Forward(datax, datah, datac);
                 var loss = mloss.Forward(h_next, datay);
                 Console.WriteLine("误差:" + loss);
                 var grid = mloss.Backward();
                 var grid2 = convLSTM.backward(grid);
                 convLSTM.update();
+                var end = DateTime.Now;
+                Console.WriteLine((end- star).TotalMilliseconds);
             }
         }
     }

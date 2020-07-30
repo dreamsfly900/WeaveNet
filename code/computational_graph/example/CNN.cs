@@ -55,7 +55,7 @@ namespace computational_graph.example
                 }
                 count++;
             }
-             
+            System.Threading.Thread.Sleep(1000);
             Minst.MinstImgArr testImg = Minst.read_Img("D:\\caffe\\Minst\\t10k-images.idx3-ubyte");
             Minst.MinstLabelArr testLabel = Minst.read_Lable("D:\\caffe\\Minst\\t10k-labels.idx1-ubyte");
             var surss = 0;
@@ -74,7 +74,6 @@ namespace computational_graph.example
                 if (vecmaxIndex(fenlei, 10) == vecmaxIndex(outputtest, 10))
                 {
                     surss++;
-
 
 
                 } else
