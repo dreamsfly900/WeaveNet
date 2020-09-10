@@ -1,10 +1,10 @@
 #  WeaveNet
 
 #### 介绍
-一个使用C#编写的用于神经网络的计算图框架computational graph。带有cnn,bp,fcn,lstm,convlstm等示例。使用方法接进pytorch。
+一个使用C#编写的用于神经网络的计算图框架computational graph。带有 **cnn,bp,fcn,lstm,convlstm,GRU** 等示例。使用方法接进pytorch。
 
 #### 软件架构
- 架构完全使用c#编写，可以看到内部任何细节的实现，包含cnn,bp,fcn,lstm,convlstm等示例内容，包含示例所用的数据内容。
+ 架构完全使用c#编写，可以看到内部任何细节的实现，包含 **cnn,bp,fcn,lstm,convlstm,GRU** 等示例内容，包含示例所用的数据内容。
 各项功能都在进行或者完事中，欢迎您参与此项事业，可与我联系：QQ群17375149，QQ20573886，email:xingyu900@live.com
 
 
