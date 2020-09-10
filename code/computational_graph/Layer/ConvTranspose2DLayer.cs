@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace computational_graph.Layer
 {
-    public enum Activfunction { Null, Sigmod, Tanh, ReLU }
-   public class Conv2DLayer
+   
+   public class ConvTranspose2DLayer
     {
         public int inChannels;   //输入图像的数目
         public int outChannels;  //输出图像的数目
@@ -25,8 +25,8 @@ namespace computational_graph.Layer
         int inweightSize;
         //Activfunction Activfunction;
         //dynamic ActaLayers;
-        public Conv2DLayer(int _stride=1, int _padding=0, int weightswidth = 5, 
-            int innum = 1, int outnum = 6, bool initW = true,bool _full=false, int _inSize = 4)
+        public ConvTranspose2DLayer(int _stride=1, int _padding=0, int weightswidth = 5, 
+            int innum = 1, int outnum = 6, bool initW = true, int _inSize = 4)
             //Activfunction _Activfunction = Activfunction.Null)
         {
             stride = _stride;
@@ -34,9 +34,9 @@ namespace computational_graph.Layer
             inChannels = innum;
             outChannels = outnum;
             inweightSize = weightswidth;
-            full = _full;
+            full = false;
             //Activfunction = _Activfunction;
-            init_Kszie(innum, outnum, weightswidth, initW, _full, _inSize);
+            init_Kszie(innum, outnum, weightswidth, initW, full, _inSize);
         }
        void init_Kszie(int innum = 1, int outnum = 6, int _weightSize = 3,bool initW = true, bool _full = false, int _inSize = 4)
         {
@@ -84,170 +84,34 @@ namespace computational_graph.Layer
         {
             //if(matrices is float[,])
             //    matrices 
-            if (full)
-            {
-                return   forfull(matrices);
-            }
-            else
-            {
+           
                 inputDatamatrices = matrices;
                 return conv( matrices);
-            }
+            
         }
         int outSizer;
         int outSizec ;
         float[][] O5inData;
-        public dynamic forfull(float[][][,] matrices)
-        {
-            int S4Channels = matrices.Length;
-            int S4outChannels = matrices[0].Length;
-            O5inData = new float[S4Channels][];
-             outSizer = matrices[0][0].GetLength(0);
-             outSizec = matrices[0][0].GetLength(1);
-            for (int g = 0; g < (S4Channels); g++)
-            {
-                O5inData[g] = new float[inChannels* inweightSize* inweightSize];
-                for (int i = 0; i < (S4outChannels); i++)
-                    for (int r = 0; r < outSizer; r++)
-                        for (int c = 0; c < outSizec; c++)
-                        {
-                            O5inData[g][i * outSizer * outSizec + r * outSizec + c] = matrices[g][i][r, c];
-                        }
-            }
-
-            //全连接，把12*（4*4）拆成一维192长度，O5.wdata,为10种分类创建一个10*192的权重，每种权重与192 卷积，得到 10个 概率。
-            //全卷积 把 12个（4*4）与 （N*N）权重，卷积后累加合成一个，如果说，输入12个MAP，输出10个，输入的12个先卷积，
-            //后累加，变成一个MAP，一共10次，得到 10个 概率。
-            float[][] outdata = new float[S4Channels][];
-            for (int g = 0; g < (S4Channels); g++)
-            {
-                outdata[g]= nnffall(O5inData[g], wdata, basicData, inChannels, outChannels);
-            }
-            //if (Activfunction == Activfunction.Sigmod)
-            //{
-            //    ActaLayers = new SigmodLayer();
-               
-            //}
-            //if (Activfunction != Activfunction.Null)
-            //{
-            //    outdata = ActaLayers.Forward(outdata);
-            //}
-            for (int g = 0; g < (S4Channels); g++)
-            {
-               
-              
-                    outdata[g] = Matrix.MatrixAdd(outdata[g], basicData);
-            }
-            return outdata;
-        }
-        float[] nnffall(float[] input, float[][] wdata, float[] bas, int inc, int outc)
-        {
-
-            float[] outadata= new float[outc];
-            int i;
-            for (i = 0; i < outc; i++)
-            {
-
-                outadata[i] = vecMulti(input, wdata[i], input.Length) + bas[i];
-            }
-            return outadata;
-        }
-        float vecMulti(float[] vec1, float[] vec2, int vecL)// 两向量相乘
-        {
-            int i;
-            float m = 0;
-            for (i = 0; i < vecL; i++)
-                m = m + vec1[i] * vec2[i];
-            return m;
-        }
+       
         public dynamic backweight(dynamic grid)
         {
 
-            if (full)
-            {
-                return backfull(grid);
-            }
-            else
-            {
+            
 
                 return backconv(grid);
-            }
-        }
-
-        private dynamic backfull(dynamic grid)
-        {
-           
-            int S4Channels = O5inData.Length;
-            float[][] data = new float[outChannels][];
-            float[] outputB = new float[outChannels];
             
-            for (int g = 0; g < (S4Channels); g++)
-            {
-                //data = new float[outChannels][];
-               
-                for (int j2 = 0; j2 < outChannels; j2++)
-                {
-                    data[j2] = new float[inChannels * inweightSize * inweightSize]; 
-                    for (int j = 0; j < inChannels * inweightSize * inweightSize; j++)
-                    {
-                        data[j2][j] += grid[g][j2] * O5inData[g][j];
-                      
-                    }
-                    outputB[j2] += grid[g][j2];
-                }
-               
-            }
-            data= Matrix.divide(data, S4Channels * outChannels);
-            outputB = Matrix.divide(outputB, S4Channels * outChannels);
-            //sum / inputData.Length / outChannels
-            var gridd = new { grid = data, basic = outputB };
-            return gridd;
         }
 
+    
         public dynamic Backward(dynamic grid)
         {
 
-            if (full)
-            {
-                return backfullY(grid);
-            }
-            else
-            {
+           
 
                 return backconvY(grid);
-            }
+            
         }
-        dynamic backfullY(float[][] grid)
-        {
-            //if (Activfunction != Activfunction.Null)
-            //{
-            //    grid =  ActaLayers.Backward(grid);
-            //}
-            int Channels = grid.Length;
-            float[][][,] ddata = new float[Channels][][,];
-          //  float[][] grid2 = new float[Channels][];
-            for (int g = 0; g < Channels; g++) {
-                float[][,] d = new float[inChannels][,];
-               
-                 
-                for (int i = 0; i < inChannels; i++)
-                {
-                    for (int r = 0; r < outSizer; r++)
-                        for (int c = 0; c < outSizec; c++)
-                            for (int j = 0; j < outChannels; j++)
-                            {
-                                int wInt = i * outSizec * outSizer + r * outSizec + c;
-                                if (d[i] == null)
-                                    d[i] = new float[outSizer, outSizec];
-                                d[i][r, c] = d[i][r, c] + grid[g][j] * wdata[j][wInt];
-                                 
-                            }
-                }
-                
-                ddata[g] = d;
-            }
-            return ddata;
-        }
+   
         dynamic backconv(float[][][,] grid)
         {
             int i, j;
@@ -269,7 +133,8 @@ namespace computational_graph.Layer
                             float[,] v1 = null;
 
                             //  float[,] tt=  Matrix.rot180(grid[cc][i]);
-                            v1 = Matrix.convolution(inputDatamatrices[cc][j], grid[cc][i], stride, padding);
+                         
+                            v1 = Matrix.Transposeconvolution(inputDatamatrices[cc][j], grid[cc][i]  , stride, padding);
                             if (outputData[i][j] != null)
                                 outputData[i][j] = Matrix.MatrixAdd(outputData[i][j], v1).values;
                             else
@@ -338,8 +203,9 @@ namespace computational_graph.Layer
                         {
                             float[,] v1 = null;
                             float[,] weight = Matrix.rot180(weights[j][i]);
+                          //  float[,] weight =(weights[j][i]);
+                            v1 = Matrix.convolution(inputData[cc][j], weight, stride, padding);
 
-                            v1 = Matrix.convnFull(inputData[cc][j], weight, stride, padding);
 
 
                             if (outputData[cc][i] != null)
@@ -396,9 +262,10 @@ namespace computational_graph.Layer
                     for (int j = 0; j < (inChannels); j++)
                     // Parallel.For(0, inChannels, j =>
                     {
-
+                        //(Height - 1) * Stride - 2 * padding + Size(Height−1)∗Stride−2∗padding + Size
                         float[,] temp;
-                        temp = Matrix.convolution(inputData[cc][j], weights[i][j], stride, padding);
+                          temp= Matrix.rot180(weights[i][j]);
+                        temp = Matrix.Transposeconvolution (inputData[cc][j], temp, stride, padding);
                         if (v1 == null)
                             v1 = new float[temp.GetLength(0), temp.GetLength(1)];
                         v1 = Matrix.MatrixAdd(v1, temp).values;

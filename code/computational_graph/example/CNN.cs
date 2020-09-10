@@ -159,15 +159,15 @@ namespace computational_graph.example
             //--------------------------------
               
 
-            grid2 = cl3.backward(grid2);
-            grid2 =ap2.backward(grid2);
+            grid2 = cl3.Backward(grid2);
+            grid2 =ap2.Backward(grid2);
             grid2 = sl2.Backward(grid2);
 
             cl2grid = cl2.backweight(grid2);//获取cl2的权重
             //-------------------------------------
 
-            grid2 = cl2.backward(grid2);
-            grid2 = ap1.backward(grid2);
+            grid2 = cl2.Backward(grid2);
+            grid2 = ap1.Backward(grid2);
             grid2 = sl.Backward(grid2);
 
             clgrid = cl.backweight(grid2);//获取cl的权重

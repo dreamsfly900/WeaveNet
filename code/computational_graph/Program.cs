@@ -14,11 +14,39 @@ namespace computational_graph
     {
         static void Main(string[] args)
         {
+            //double jiaodu= Math.Atan((37-300)/-(10 *10));
+            //jiaodu = (180.0 * jiaodu / Math.PI);
+            //if (jiaodu < 70) { }
+            //float[] valueADList = new float[] { 0, 1, 10, 15, 24, 888 };
+            //int FilterNumber = valueADList.Length;
+            //for (int j = 0; j < FilterNumber - 1; j++)
+            //{
+            //    for (int i = 0; i < FilterNumber - 1 - j; i++)
+            //    {
+            //        if (valueADList[i] > valueADList[i + 1])
+            //        {
+            //            var temp = valueADList[i];
+            //            valueADList[i] = valueADList[i + 1];
+            //            valueADList[i + 1] = temp;
+            //        }
+            //    }
+            //}
 
-             
+            //float sum = 0F;
+            //int N = 4;//N必须为偶数
+            //          //去掉N/2个最大值和最小值
+            //for (int i = 0; i < FilterNumber - N ; i++)
+            //{
+            //    sum += valueADList[i];
+            //}
 
 
-              test2D();
+            //float value=  (sum / (FilterNumber - N));
+
+
+
+
+            test2D();
             Console.ReadLine();
         }
       
@@ -67,7 +95,7 @@ namespace computational_graph
 
             //grad = tl.backward(grad);
 
-            dynamic grad3 = cl.backward(grad);//卷积计算在 所有计算的最后面进行
+            dynamic grad3 = cl.Backward(grad);//卷积计算在 所有计算的最后面进行
 
             prirt(grad3.grid);
             prirt(grad3.basic);

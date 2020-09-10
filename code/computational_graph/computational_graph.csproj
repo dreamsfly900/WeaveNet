@@ -17,7 +17,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>true</Optimize>
+    <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -35,7 +35,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>computational_graph.example.CNNtest</StartupObject>
+    <StartupObject>computational_graph.example.交叉损失函数测试</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -59,6 +59,7 @@
     <Compile Include="example\LSTM.-RNN.cs" />
     <Compile Include="example\CNN.cs" />
     <Compile Include="example\交叉损失函数测试.cs" />
+    <Compile Include="Layer\ConvTranspose2DLayer.cs" />
     <Compile Include="Layer\Dropout.cs" />
     <Compile Include="Layer\Layer.cs" />
     <Compile Include="Layer\Averpooling.cs" />
@@ -71,6 +72,7 @@
     <Compile Include="loss\BCELoss.cs" />
     <Compile Include="loss\cross-entropy.cs" />
     <Compile Include="loss\MESLOSS.cs" />
+    <Compile Include="Util\ImgUtil.cs" />
     <Compile Include="Util\Matrix.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -85,129 +87,47 @@
     <None Include="packages.config" />
     <None Include="data\train-images.idx3-ubyte" />
     <None Include="data\train-labels.idx1-ubyte" />
-    <None Include="res\BCR_Data03181104.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181109.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181115.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181121.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181126.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181132.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181137.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181143.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181149.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181154.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181200.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181205.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181211.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181216.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181222.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181228.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181233.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181239.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181244.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181250.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181256.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181301.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181307.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181312.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181318.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181324.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181329.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181335.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181340.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181346.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181351.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181357.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181403.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181408.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181414.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181419.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181425.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181431.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181436.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181442.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\BCR_Data03181447.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="res\BCR_Data03181104.json" />
+    <None Include="res\BCR_Data03181109.json" />
+    <None Include="res\BCR_Data03181115.json" />
+    <None Include="res\BCR_Data03181121.json" />
+    <None Include="res\BCR_Data03181126.json" />
+    <None Include="res\BCR_Data03181132.json" />
+    <None Include="res\BCR_Data03181137.json" />
+    <None Include="res\BCR_Data03181143.json" />
+    <None Include="res\BCR_Data03181149.json" />
+    <None Include="res\BCR_Data03181154.json" />
+    <None Include="res\BCR_Data03181200.json" />
+    <None Include="res\BCR_Data03181205.json" />
+    <None Include="res\BCR_Data03181211.json" />
+    <None Include="res\BCR_Data03181216.json" />
+    <None Include="res\BCR_Data03181222.json" />
+    <None Include="res\BCR_Data03181228.json" />
+    <None Include="res\BCR_Data03181233.json" />
+    <None Include="res\BCR_Data03181239.json" />
+    <None Include="res\BCR_Data03181244.json" />
+    <None Include="res\BCR_Data03181250.json" />
+    <None Include="res\BCR_Data03181256.json" />
+    <None Include="res\BCR_Data03181301.json" />
+    <None Include="res\BCR_Data03181307.json" />
+    <None Include="res\BCR_Data03181312.json" />
+    <None Include="res\BCR_Data03181318.json" />
+    <None Include="res\BCR_Data03181324.json" />
+    <None Include="res\BCR_Data03181329.json" />
+    <None Include="res\BCR_Data03181335.json" />
+    <None Include="res\BCR_Data03181340.json" />
+    <None Include="res\BCR_Data03181346.json" />
+    <None Include="res\BCR_Data03181351.json" />
+    <None Include="res\BCR_Data03181357.json" />
+    <None Include="res\BCR_Data03181403.json" />
+    <None Include="res\BCR_Data03181408.json" />
+    <None Include="res\BCR_Data03181414.json" />
+    <None Include="res\BCR_Data03181419.json" />
+    <None Include="res\BCR_Data03181425.json" />
+    <None Include="res\BCR_Data03181431.json" />
+    <None Include="res\BCR_Data03181436.json" />
+    <None Include="res\BCR_Data03181442.json" />
+    <None Include="res\BCR_Data03181447.json" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="PRSA_data.txt">

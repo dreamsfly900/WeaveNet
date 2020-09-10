@@ -1,5 +1,6 @@
 ﻿using computational_graph.Layer;
 using computational_graph.loss;
+using DenseCRF;
 using FCN;
 using System;
 using System.Collections.Generic;
@@ -14,49 +15,168 @@ namespace computational_graph.example
     {
         static void Main(string[] args)
         {
+            //tian();
+          //  test();
+           
+        }
+        static void test()
+        {
+            string[] files = System.IO.Directory.GetFiles("test");
+            files = files.OrderBy(p => p).ToArray();
+            float[][][,] datax = new float[1][][,];
+            float[][][,] datah = new float[1][][,];
+            float[][][,] datac = new float[1][][,];
+            float[][][,] datay = new float[1][][,];
+            datax[0] = new float[1][,];
+            datah[0] = new float[1][,];
+            datac[0] = new float[1][,];
+            datay[0] = new float[1][,];
+            MSELoss mloss = new MSELoss();
+            ConvLSTMCell convLSTM = new ConvLSTMCell(1, 1, 5);
+            convLSTM.load("radar.bin");
+            for (int t = 0; t < 1; t++)
+            {
+                datah[0][t] = new float[128, 128];
+                datac[0][t] = new float[128, 128];
+            }
+            for (int r = 0; r < files.Length - 11; r++)
+            {
+                var loss = 0.0f;
+                for (int t = 0; t < 10; t++)
+                {
+                    string file = files[r + t];
+                    float[,] anno1 = DenseCRF.util.readRADARMatrix(file);
+                    anno1 = ImgUtil.BilinearInterp(anno1, 128, 128);
+                    datax[0][0] = anno1;
+                    string file2 = files[r + t + 10];
+                    datay[0][0] = DenseCRF.util.readRADARMatrix(file2);
+                    datay[0][0] = ImgUtil.BilinearInterp(datay[0][0], 128, 128);
+
+                    var (h_next, c_next) = convLSTM.Forward(datax, datah, datac);
+                    datah = h_next;
+                    datac = c_next;
+                    loss += mloss.Forward(h_next, datay);
+                     
+                        //ImgUtil.savefile(datax[0][t], "testpng/" + (t ) + ".png");
+                        //ImgUtil.savefile(datay[0][t], "testpng/" + (t+10) + ".png");
+                        ImgUtil.savefile(h_next[0][0], "testpng/a" + (t + 10) + ".png");
+
+                    
+                    //var grid = mloss.Backward();
+                    //var grid2 = convLSTM.backward(grid);
+                    //convLSTM.update();
+
+
+                }
+              
+               
+
+                    //var grid = mloss.Backward();
+                    //var grid2 = convLSTM.backward(grid);
+                    //convLSTM.update();
+                    //convLSTM.save("radar.bin");
+                //    var end = DateTime.Now;
+                //Console.WriteLine((end - star).TotalMilliseconds);
+            }
+        }
+        static void tian()
+        {
+            var tt = 1;
             string[] files = System.IO.Directory.GetFiles("res");
             files = files.OrderBy(p => p).ToArray();
             float[][][,] datax = new float[1][][,];
             float[][][,] datah = new float[1][][,];
             float[][][,] datac = new float[1][][,];
             float[][][,] datay = new float[1][][,];
-            datax[0] = new float[10][,];
-            datah[0] = new float[10][,];
-            datac[0] = new float[10][,];
-            datay[0] = new float[10][,];
+            datax[0] = new float[tt][,];
+            datah[0] = new float[tt][,];
+            datac[0] = new float[tt][,];
+            datay[0] = new float[tt][,];
             MSELoss mloss = new MSELoss();
-            ConvLSTM convLSTM = new ConvLSTM(10, 10, 5);
-            for (int r = 0; r < files.Length-10; r++)
+            ConvLSTMCell convLSTM = new ConvLSTMCell(tt, tt, 3);
+              convLSTM.load("radar.bin");
+            for (int t = 0; t < tt; t++)
             {
-                for (int t = 0; t < 10; t++)
+                datah[0][t] = new float[128, 128];
+                datac[0][t] = new float[128, 128];
+            }
+            int gg = 0;
+            while (gg < 100)
+            {
+                for (int r = 0; r < 1; r++)
                 {
-                    string file = files[r+t];
-                    float[,] anno1 = DenseCRF.util.readRADARMatrix(file);
-                    datax[0][t] = anno1;
-                    datah[0][t] = new float[anno1.GetLength(0), anno1.GetLength(1)];
-                    datac[0][t] = new float[anno1.GetLength(0), anno1.GetLength(1)];
-                    file = files[r+t + 10];
-                    datay[0][t] = DenseCRF.util.readRADARMatrix(file);
-                }
+                    var star = DateTime.Now;
+                    var loss = 0.0f;
+                    for (int t = 0; t < 10; t++)
+                    {
+                        string file = files[r + t];
+                        float[,] anno1 = DenseCRF.util.readRADARMatrix(file);
+                        anno1 = ImgUtil.BilinearInterp(anno1, 128, 128);
+                        datax[0][0] = anno1;
 
-                var star = DateTime.Now;
-                var (h_next, c_next) = convLSTM.Forward(datax, datah, datac);
-                var loss = mloss.Forward(h_next, datay);
-                Console.WriteLine("误差:" + loss);
-                var grid = mloss.Backward();
-                var grid2 = convLSTM.backward(grid);
-                convLSTM.update();
-                var end = DateTime.Now;
-                Console.WriteLine((end- star).TotalMilliseconds);
+                        string file2 = files[r + t + 10];
+                        datay[0][0] = DenseCRF.util.readRADARMatrix(file2);
+                        datay[0][0] = ImgUtil.BilinearInterp(datay[0][0], 128, 128);
+                        var (h_next, c_next) = convLSTM.Forward(datax, datah, datac);
+                        datah = h_next;
+                        datac = c_next;
+                        loss += mloss.Forward(h_next, datay);
+                        var grid = mloss.Backward();
+                        var grid2 = convLSTM.backward(grid);
+                        convLSTM.update();
+                        ImgUtil.savefile2(h_next[0][0], "testpng/a" + (t + 10) + ".png");
+                    }
+
+
+                
+                    Console.WriteLine("误差:" + loss);
+                    ////for (int t = 0; t < tt; t++)
+                    //ImgUtil.savefile(h_next[0][t], "testpng/a" + (t + 10) + ".png");
+
+                    convLSTM.save("radar.bin");
+                    var end = DateTime.Now;
+                    Console.WriteLine((end - star).TotalMilliseconds);
+                    //for (int t = 0; t < tt; t++)
+                    //    ImgUtil.savefile(datah[0][t], "testpng/a" + (t + 10) + ".png");
+                }
+                gg++;
             }
         }
     }
-   public class ConvLSTM
+    public class ConvLSTM
+    {
+        int input_size; int hidden_size; int step=1;
+        ConvLSTMCell [] cell;
+        Conv2DLayer[] convl;
+        List<float[][][,]> listh = new List<float[][][,]>();
+        List<float[][][,]> listc = new List<float[][][,]>();
+        public ConvLSTM(int _input_size,int output, int weightssize,int _step)
+        {
+            input_size = _input_size;
+            hidden_size = output;
+            step = _step;
+            cell =new  ConvLSTMCell[3];
+            convl = new Conv2DLayer[3];
+           convl[0] = new Conv2DLayer(2, 0, weightssize, _input_size, _input_size);
+            cell[0] = new ConvLSTMCell(_input_size, 5, weightssize);
+            convl[1] = new Conv2DLayer(2, 0, weightssize, 5, 5);
+            cell[1] = new ConvLSTMCell(5, 15, weightssize);
+            convl[2] = new Conv2DLayer(2, 0, weightssize, 15, 15);
+            cell[2] = new ConvLSTMCell(15, output, weightssize);
+
+        }
+        public dynamic Forward(float[][][,] x)
+        {
+            return 0;
+        }
+
+    }
+   public class ConvLSTMCell
     {
         Conv2DLayer convLayerih;
         Conv2DLayer convLayerhh;
         int input_size; int hidden_size;
-        public ConvLSTM(int _input_size, int _hidden_size,int weightssize)
+        public ConvLSTMCell(int _input_size, int _hidden_size,int weightssize)
         {
             input_size = _input_size;
             hidden_size = _hidden_size;
@@ -133,7 +253,7 @@ namespace computational_graph.example
             // var daT=Matrix.T(da);
             ihweight = convLayerih.backweight(da);
             hhweight = convLayerhh.backweight(da);
-            return convLayerih.backward(da);
+            return convLayerih.Backward(da);
         }
         float lr = 0.1f;
         public void update()
@@ -144,6 +264,31 @@ namespace computational_graph.example
             convLayerhh.weights = Matrix.MatrixSub(convLayerhh.weights, Matrix.multiply(hhweight.grid, lr));
             convLayerhh.basicData = Matrix.MatrixSub(convLayerhh.basicData, Matrix.multiply(hhweight.basic, lr));
 
+        }
+        public void load(string file)
+        {
+            string str = "";
+            System.IO.StreamReader sw = new System.IO.StreamReader(file);
+            str=sw.ReadToEnd();
+            sw.Close();
+            object[] obj= Newtonsoft.Json.JsonConvert.DeserializeObject<object[]>(str);
+            convLayerih.weights = Newtonsoft.Json.JsonConvert.DeserializeObject<float[][][,]>(obj[0].ToString()) ;
+            convLayerih.basicData = Newtonsoft.Json.JsonConvert.DeserializeObject<float[]>(obj[1].ToString());  
+            convLayerhh.weights = Newtonsoft.Json.JsonConvert.DeserializeObject<float[][][,]>(obj[2].ToString()); 
+            convLayerhh.basicData = Newtonsoft.Json.JsonConvert.DeserializeObject<float[]>(obj[3].ToString());
+
+        }
+        public void save(string file)
+        {
+            object[] obj = new object[4];
+            obj[0] = convLayerih.weights;
+            obj[1] = convLayerih.basicData;
+            obj[2] = convLayerhh.weights;
+            obj[3] = convLayerhh.basicData;
+            string str= Newtonsoft.Json.JsonConvert.SerializeObject(obj);
+            System.IO.StreamWriter sw = new System.IO.StreamWriter(file);
+            sw.Write(str);
+            sw.Close();
         }
     }
 }

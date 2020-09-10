@@ -2282,38 +2282,50 @@ namespace FCN
             var row = ((x - x2) + 2 * p) / stride + 1;
             var col = ((y - y2) + 2 * p) / stride + 1;
             float[,] temp = new float[row, col];
+            int rows = 0,clos=0;
           //  fixed (float* temparr = &temp[0, 0])
             {
                 fixed (float* marr = &m[0, 0])
                 {
                     fixed (float* arr = &value[0, 0])
                     {
-                        for (var i = 0 - p; i <= x - x2 + p; i = i + stride)
+                        for (var i = 0 - p; i < x; i = i + stride)
                         {
                             //  i = i + stride;
                             //  var ny = 0;
                             // int i = cc * stride;
-                            if (i >= 0 && i < x)
-                                for (var j = 0 - p; j <= y - y2 + p; j = j + stride)
+
+                          
+                            if (rows < x)
+                            {
+                                clos = 0;
+                                for (var j = 0 - p; j < y; j = j + stride)
                                 {
-                                    if (j >= 0 && j < y)
+                                    if (clos < y)
                                     {
                                         for (var i2 = 0; i2 < x2; i2++)
                                             for (var j2 = 0; j2 < y2; j2++)
                                             {
-                                                if (i + i2 < 0 || j + j2 < 0 || i + i2 >= x || j + j2 >= y)
+                                                if (i + i2 < 0 || j + j2 < 0 || i + i2 >= x  || j + j2 >= y)
                                                 { continue; }
                                                 else
                                                 {
                                                     // float bb = (*(arr + (j + (i * x)) + i2 + j2)) * (*(marr + j2 + (i2 * x2)));
-                                                    temp[i, j] += (*(arr + (j + ((i + i2) * x)) + j2)) * (*(marr + j2 + (i2 * x2)));
+                                                    temp[rows, clos] += (*(arr + (j + ((i + i2) * x)) + j2)) * (*(marr + j2 + (i2 * x2)));
                                                     //   * (temparr + (j + (i * x))) += (*(arr + (j + ((i + i2) * x)) + j2)) * (*(marr + j2 + (i2 * x2)));
                                                     // temp[i, j] += value[i + i2, j + j2] * m[i2, j2];
                                                 }
                                             }
-                                        // temp[i, j] = (float)(temp[i, j]);
+
+                                        clos++;
                                     }
+                                    // temp[i, j] = (float)(temp[i, j]);
                                 }
+
+
+                                rows++;
+                            }
+
                             // temp[nx, ny] = Math.Max(ReLU, temp[nx, ny] + bias);
                             // ny++;
 
@@ -2324,6 +2336,64 @@ namespace FCN
                 }
             }
             return temp;
+        }
+        public static float[,] Transposeconvolution(float[,] value, float[,] m, int stride, int padding = 0) {
+            //if (padding == 0)
+            //    padding = m.GetLength(0) / 2 + m.GetLength(0)%2==0?0:1;
+           
+            float[,] data= extend(value, stride,padding,m.GetLength(0));
+            //if (data.GetLength(0) % 2 == 0 && data.GetLength(1) % 2 == 0 && padding==0)
+            //    data = sub(data, -1, -1);
+            return  Conv(data, m, 1, 0);
+        }
+        static float[,] sub(float[,] value, int x, int y)
+        {
+            int w = value.GetLength(0);
+            int h = value.GetLength(1);
+            w = w + x;
+            h = h + y;
+            float[,] data = new float[w, h];
+            for (int i = 0; i < w ; i++)
+            {
+                for (int j = 0; j < h; j++)
+                {
+                    data[i, j] = value[i, j];
+                }
+            }
+            return data;
+        }
+           static float[,] extend(float[,] value,int stride, int padding,int ksize)
+        {
+            int w = value.GetLength(0);
+            int h=value.GetLength(1);
+            int paddingn = ksize - padding - 1;
+            w = w  + (w - 1) * (stride - 1) + (paddingn * 2);
+            h = h   + (h - 1) * (stride - 1) + (paddingn * 2);
+            //if (w % 2 == 0 && h % 2 == 0)
+            //{
+
+            //    w = w + 1;
+            //    h = h + 1;
+            //    padding += 1;
+            //}
+
+
+            padding = paddingn;
+            //padding = ksize / 2 + ksize % 2 == 0 ? 0 : 1;
+            float[,] data = new float[w,h];
+            int a = 0, b = 0;
+            for (int i = padding; i < w - (padding); i = i + stride)
+            {
+                b = 0;
+                for (int j = padding; j < h- (padding); j=j+ stride)
+                {
+                   
+                    data[i, j] = value[a,b];
+                    b++;
+                }
+                a++;
+            }
+            return data;
         }
         public static float[,] convolution(float[,] value, float[,] m, int stride, int padding = 0)
         {
