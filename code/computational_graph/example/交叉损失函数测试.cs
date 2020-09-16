@@ -16,8 +16,8 @@ namespace computational_graph.example
 
 
 
-            //ConvTranspose2DLayer ct2d = new ConvTranspose2DLayer(2,1, 3, 1, 1);
-            Conv2DLayer ct2d = new Conv2DLayer(1, 1, 3, 1, 1);
+            ConvTranspose2DLayer ct2d = new ConvTranspose2DLayer(2,1, 3, 1, 1);
+           // Conv2DLayer ct2d = new Conv2DLayer(2, 1, 3, 1, 1);
             ct2d.basicData = new float[] { 0.0882f };
             ct2d.weights = new float[1][][,];
             ct2d.weights[0] = new float[1][,];
@@ -39,19 +39,19 @@ namespace computational_graph.example
             for (int i = 0; i < 2; i++)
                 for (int j = 0; j < 2; j++)
                     dd[0][0][i, j] = 1;
-            dynamic data= ct2d.Forward(dd2);
+            dynamic data= ct2d.Forward(dd);
             util.prirt(data);
-           
-           // MSELoss mSELoss = new MSELoss();
-           //var loss=  mSELoss.Forward(dd2,data);
 
-           // //dynamic grid = ct2d.Backward(data);
-           // //util.prirt(grid);
-           // dynamic grid2 = mSELoss.Backward();
-           // dynamic grid3= ct2d.Backward(grid2);
-           // util.prirt(grid3);
-           // dynamic weight = ct2d.backweight(grid2);
-           // util.prirt(weight.grid);
+            MSELoss mSELoss = new MSELoss();
+            var loss = mSELoss.Forward(dd2, data);
+            dynamic grid2 = mSELoss.Backward();
+            dynamic grid = ct2d.Backward(data);
+            util.prirt(grid);
+            // dynamic grid2 = mSELoss.Backward();
+            // dynamic grid3= ct2d.Backward(grid2);
+            // util.prirt(grid3);
+            // dynamic weight = ct2d.backweight(grid2);
+            // util.prirt(weight.grid);
             //float[] grid = new float[] { 11, 12, 13, 14, 15, 16, 17, 18, 19 };
             //Softmax softmax = new Softmax();
             //var sss = softmax.Forward(new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9});

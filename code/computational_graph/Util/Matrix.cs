@@ -2296,12 +2296,12 @@ namespace FCN
                             // int i = cc * stride;
 
                           
-                            if (rows < x)
+                            if (rows < row)
                             {
                                 clos = 0;
                                 for (var j = 0 - p; j < y; j = j + stride)
                                 {
-                                    if (clos < y)
+                                    if (clos < col)
                                     {
                                         for (var i2 = 0; i2 < x2; i2++)
                                             for (var j2 = 0; j2 < y2; j2++)

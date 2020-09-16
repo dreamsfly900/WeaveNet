@@ -10,9 +10,9 @@ if __name__ == '__main__':
    input=torch.ones(1,1,2,2)
    input2=torch.ones(1,1,3,3)
    outputa=torch.ones(1,1,2,2)
-   #m=nn.ConvTranspose2d(1,1,3,2,1)
-   m=nn.Conv2d(1,1,3,1,1)
-   output=m(input2)
+   m=nn.ConvTranspose2d(1,1,3,2,1)
+   #m=nn.Conv2d(1,1,3,2,1)
+   output=m(input)
    print(output)
    #output=output
 
