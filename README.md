@@ -16,7 +16,7 @@
 2.  激活函数支持：ReLu，Tanh，Sigmod，Softmax
 3.  数据类型支持： float[][] 与 float[][][,]，二维与四维
 4.  池化支持：平均池化，最大池化
-5.  其他支持：ConvLayer，Conv2DLayer，MulLayer
+5.  其他支持：ConvLayer，Conv2DLayer，MulLayer,ConvTranspose2DLayer
 
  部分BP代码示例
 
