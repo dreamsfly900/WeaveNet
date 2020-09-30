@@ -16,7 +16,7 @@ namespace computational_graph.example
         static void Main(string[] args)
         {
             //tian();
-          //  test();
+            test();
            
         }
         static void test()
@@ -27,18 +27,14 @@ namespace computational_graph.example
             float[][][,] datah = new float[1][][,];
             float[][][,] datac = new float[1][][,];
             float[][][,] datay = new float[1][][,];
-            datax[0] = new float[1][,];
-            datah[0] = new float[1][,];
-            datac[0] = new float[1][,];
-            datay[0] = new float[1][,];
+            datax[0] = new float[10][,];
+            datah[0] = new float[10][,];
+            datac[0] = new float[10][,];
+            datay[0] = new float[10][,];
             MSELoss mloss = new MSELoss();
-            ConvLSTMCell convLSTM = new ConvLSTMCell(1, 1, 5);
-            convLSTM.load("radar.bin");
-            for (int t = 0; t < 1; t++)
-            {
-                datah[0][t] = new float[128, 128];
-                datac[0][t] = new float[128, 128];
-            }
+            ConvLSTM convLSTM = new ConvLSTM(10, 10, 3);
+          //  convLSTM.load("radar.bin");
+           
             for (int r = 0; r < files.Length - 11; r++)
             {
                 var loss = 0.0f;
@@ -47,19 +43,18 @@ namespace computational_graph.example
                     string file = files[r + t];
                     float[,] anno1 = DenseCRF.util.readRADARMatrix(file);
                     anno1 = ImgUtil.BilinearInterp(anno1, 128, 128);
-                    datax[0][0] = anno1;
+                    datax[0][t] = anno1;
                     string file2 = files[r + t + 10];
-                    datay[0][0] = DenseCRF.util.readRADARMatrix(file2);
-                    datay[0][0] = ImgUtil.BilinearInterp(datay[0][0], 128, 128);
-
-                    var (h_next, c_next) = convLSTM.Forward(datax, datah, datac);
-                    datah = h_next;
-                    datac = c_next;
+                    datay[0][t] = DenseCRF.util.readRADARMatrix(file2);
+                    datay[0][t] = ImgUtil.BilinearInterp(datay[0][t], 128, 128);
+                }
+                   var h_next= convLSTM.Forward(datax);
+                     
                     loss += mloss.Forward(h_next, datay);
                      
                         //ImgUtil.savefile(datax[0][t], "testpng/" + (t ) + ".png");
                         //ImgUtil.savefile(datay[0][t], "testpng/" + (t+10) + ".png");
-                        ImgUtil.savefile(h_next[0][0], "testpng/a" + (t + 10) + ".png");
+                        //ImgUtil.savefile(h_next[0][0], "testpng/a" + (t + 10) + ".png");
 
                     
                     //var grid = mloss.Backward();
@@ -67,7 +62,7 @@ namespace computational_graph.example
                     //convLSTM.update();
 
 
-                }
+              
               
                
 
@@ -79,95 +74,101 @@ namespace computational_graph.example
                 //Console.WriteLine((end - star).TotalMilliseconds);
             }
         }
-        static void tian()
-        {
-            var tt = 1;
-            string[] files = System.IO.Directory.GetFiles("res");
-            files = files.OrderBy(p => p).ToArray();
-            float[][][,] datax = new float[1][][,];
-            float[][][,] datah = new float[1][][,];
-            float[][][,] datac = new float[1][][,];
-            float[][][,] datay = new float[1][][,];
-            datax[0] = new float[tt][,];
-            datah[0] = new float[tt][,];
-            datac[0] = new float[tt][,];
-            datay[0] = new float[tt][,];
-            MSELoss mloss = new MSELoss();
-            ConvLSTMCell convLSTM = new ConvLSTMCell(tt, tt, 3);
-              convLSTM.load("radar.bin");
-            for (int t = 0; t < tt; t++)
-            {
-                datah[0][t] = new float[128, 128];
-                datac[0][t] = new float[128, 128];
-            }
-            int gg = 0;
-            while (gg < 100)
-            {
-                for (int r = 0; r < 1; r++)
-                {
-                    var star = DateTime.Now;
-                    var loss = 0.0f;
-                    for (int t = 0; t < 10; t++)
-                    {
-                        string file = files[r + t];
-                        float[,] anno1 = DenseCRF.util.readRADARMatrix(file);
-                        anno1 = ImgUtil.BilinearInterp(anno1, 128, 128);
-                        datax[0][0] = anno1;
-
-                        string file2 = files[r + t + 10];
-                        datay[0][0] = DenseCRF.util.readRADARMatrix(file2);
-                        datay[0][0] = ImgUtil.BilinearInterp(datay[0][0], 128, 128);
-                        var (h_next, c_next) = convLSTM.Forward(datax, datah, datac);
-                        datah = h_next;
-                        datac = c_next;
-                        loss += mloss.Forward(h_next, datay);
-                        var grid = mloss.Backward();
-                        var grid2 = convLSTM.backward(grid);
-                        convLSTM.update();
-                        ImgUtil.savefile2(h_next[0][0], "testpng/a" + (t + 10) + ".png");
-                    }
-
-
-                
-                    Console.WriteLine("误差:" + loss);
-                    ////for (int t = 0; t < tt; t++)
-                    //ImgUtil.savefile(h_next[0][t], "testpng/a" + (t + 10) + ".png");
-
-                    convLSTM.save("radar.bin");
-                    var end = DateTime.Now;
-                    Console.WriteLine((end - star).TotalMilliseconds);
-                    //for (int t = 0; t < tt; t++)
-                    //    ImgUtil.savefile(datah[0][t], "testpng/a" + (t + 10) + ".png");
-                }
-                gg++;
-            }
-        }
+        
     }
     public class ConvLSTM
     {
         int input_size; int hidden_size; int step=1;
         ConvLSTMCell [] cell;
         Conv2DLayer[] convl;
+        ConvTranspose2DLayer[] convt2d;
+        TanhLayer[] tanhLayers;
         List<float[][][,]> listh = new List<float[][][,]>();
         List<float[][][,]> listc = new List<float[][][,]>();
-        public ConvLSTM(int _input_size,int output, int weightssize,int _step)
+        public ConvLSTM(int _input_size,int output, int weightssize,int _step=1)
         {
             input_size = _input_size;
             hidden_size = output;
             step = _step;
             cell =new  ConvLSTMCell[3];
             convl = new Conv2DLayer[3];
-           convl[0] = new Conv2DLayer(2, 0, weightssize, _input_size, _input_size);
-            cell[0] = new ConvLSTMCell(_input_size, 5, weightssize);
-            convl[1] = new Conv2DLayer(2, 0, weightssize, 5, 5);
-            cell[1] = new ConvLSTMCell(5, 15, weightssize);
-            convl[2] = new Conv2DLayer(2, 0, weightssize, 15, 15);
-            cell[2] = new ConvLSTMCell(15, output, weightssize);
+            convt2d = new ConvTranspose2DLayer[3];
+            tanhLayers = new TanhLayer[6]; 
+            convl[0] = new Conv2DLayer(2, 1, weightssize, _input_size, 8);
+            cell[0] = new ConvLSTMCell(8, 8, weightssize);
+            tanhLayers[0] = new TanhLayer();
+            convl[1] = new Conv2DLayer(2, 1, weightssize, 8, 16);
+            cell[1] = new ConvLSTMCell(16, 16, weightssize);
+            tanhLayers[1] = new TanhLayer();
+            convl[2] = new Conv2DLayer(2, 1, weightssize, 16, 32);
+            cell[2] = new ConvLSTMCell(32, 32, weightssize);
+            tanhLayers[2] = new TanhLayer();
+            convt2d[0] = new ConvTranspose2DLayer(2, 1, weightssize+1, 32, 16);
+            tanhLayers[3] = new TanhLayer();
+            convt2d[1] = new ConvTranspose2DLayer(2, 1, weightssize+1, 16, 8);
+            tanhLayers[4] = new TanhLayer();
+            convt2d[2] = new ConvTranspose2DLayer(2, 1, weightssize+1, 8, hidden_size);
+            tanhLayers[5] = new TanhLayer();
 
         }
         public dynamic Forward(float[][][,] x)
         {
-            return 0;
+        
+            float[][][,] h_prev2=null ;
+            float[][][,] c_prev2 = null;
+            float[][][,] h_prev3 = null;
+            float[][][,] c_prev3 = null;
+           //wet List<dynamic> list = new List<dynamic>();
+            //for (int i = 0; i < hidden_size; i++)
+            //{
+
+                var y = convl[0].Forward(x);
+                float[][][,] h_prev = zroe(y);
+                float[][][,] c_prev = zroe(y);
+                y = cell[0].Forward(y, h_prev, c_prev).Item1;
+                y = tanhLayers[0].Forward(y);
+                y = convl[1].Forward(y);
+               // if (i == 0)
+                {
+                    h_prev2 = zroe(y);
+                    c_prev2 = zroe(y);
+
+                }
+                y = cell[1].Forward(y, h_prev2, c_prev2).Item1;
+                y = tanhLayers[1].Forward(y);
+                y = convl[2].Forward(y);
+               // if (i == 0)
+                {
+                    h_prev3 = zroe(y);
+                    c_prev3 = zroe(y);
+
+                }
+                y = cell[2].Forward(y, h_prev3, c_prev3).Item1;
+                y = tanhLayers[2].Forward(y);
+                y = convt2d[0].Forward(y);
+                y = tanhLayers[3].Forward(y);
+                y = convt2d[1].Forward(y);
+                y = tanhLayers[4].Forward(y);
+                y = convt2d[2].Forward(y);
+                y = tanhLayers[5].Forward(y);
+            //    list.Add(y);
+            //}
+            return y;
+        }
+        dynamic zroe(float[][][,] x)
+        {
+            float[][][,] h_prev = new float[x.Length][][,];
+            for (int i = 0; i < x.Length; i++)
+            {
+                h_prev[i] = new float[x[i].Length][,];
+                
+                for (int j = 0; j < x[i].Length; j++)
+                {
+                    h_prev[i][j] = new float[x[i][j].GetLength(0), x[i][j].GetLength(1)];
+    
+                }
+            }
+            return h_prev;
         }
 
     }

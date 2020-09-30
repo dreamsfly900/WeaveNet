@@ -134,7 +134,8 @@ namespace computational_graph.Layer
 
                             //  float[,] tt=  Matrix.rot180(grid[cc][i]);
                          
-                            v1 = Matrix.Transposeconvolution(inputDatamatrices[cc][j], grid[cc][i]  , stride, padding);
+                            v1 = Matrix.Transposeconvolution(inputDatamatrices[cc][j], grid[cc][i], stride, padding);
+                            v1 = Matrix.rot180(v1);
                             if (outputData[i][j] != null)
                                 outputData[i][j] = Matrix.MatrixAdd(outputData[i][j], v1).values;
                             else

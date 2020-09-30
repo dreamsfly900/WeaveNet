@@ -17,14 +17,19 @@ namespace computational_graph.example
 
 
             ConvTranspose2DLayer ct2d = new ConvTranspose2DLayer(2,1, 3, 1, 1);
-           // Conv2DLayer ct2d = new Conv2DLayer(2, 1, 3, 1, 1);
-            ct2d.basicData = new float[] { 0.0882f };
+            Conv2DLayer con2d = new Conv2DLayer(1, 0, 2, 1, 1);
+            con2d.basicData = new float[] { -0.1029f };
+            con2d.weights = new float[1][][,];
+            con2d.weights[0] = new float[1][,];
+            con2d.weights[0][0] = new float[,] { { -0.3390f,-0.2177f },{ 0.1816f,0.4152f} };
+            // Conv2DLayer ct2d = new Conv2DLayer(2, 1, 3, 1, 1);
+            ct2d.basicData = new float[] { 0.2f };
             ct2d.weights = new float[1][][,];
             ct2d.weights[0] = new float[1][,];
             ct2d.weights[0][0] = new float[,] { 
-                { -0.0025f,  0.1788f, -0.2743f },
-                { -0.2453f, -0.1284f,  0.0894f }
-                ,{-0.0066f,  0.2643f, -0.0296f } };
+                { -0.0296f,  0.0882f, -0.1007f },
+                { -0.0655f, -0.3184f, -0.2208f }
+                ,{-0.1374f,  0.0123f,  0.1318f} };
             float[][][,] dd = new float[1][][,];
          
             float[][][,] dd2 = new float[1][][,];
@@ -39,19 +44,30 @@ namespace computational_graph.example
             for (int i = 0; i < 2; i++)
                 for (int j = 0; j < 2; j++)
                     dd[0][0][i, j] = 1;
-            dynamic data= ct2d.Forward(dd);
+            float[][][,] dd3 = new float[1][][,];
+            dd3[0] = new float[1][,];
+            dd3[0][0] = new float[,] { 
+                { 1.5410f, -0.2934f },
+                { -2.1788f, 0.5684f } };
+
+
+            dynamic data = con2d.Forward(dd);
+             data = ct2d.Forward(data);
             util.prirt(data);
 
             MSELoss mSELoss = new MSELoss();
-            var loss = mSELoss.Forward(dd2, data);
+            var loss = mSELoss.Forward(data, dd2);//左边X,右边Y
             dynamic grid2 = mSELoss.Backward();
-            dynamic grid = ct2d.Backward(data);
-            util.prirt(grid);
+            grid2 = ct2d.Backward(grid2);
+            // dynamic grid = ct2d.Backward(grid2);
+            //  dynamic grid = mulLayer.backward(grid2);
+            dynamic weight = con2d .backweight(grid2);
+            util.prirt(weight.grid);
+           // util.prirt(grid);
             // dynamic grid2 = mSELoss.Backward();
             // dynamic grid3= ct2d.Backward(grid2);
             // util.prirt(grid3);
-            // dynamic weight = ct2d.backweight(grid2);
-            // util.prirt(weight.grid);
+        
             //float[] grid = new float[] { 11, 12, 13, 14, 15, 16, 17, 18, 19 };
             //Softmax softmax = new Softmax();
             //var sss = softmax.Forward(new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9});
