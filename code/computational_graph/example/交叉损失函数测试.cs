@@ -40,9 +40,9 @@ namespace computational_graph.example
                     dd2[0][0][i, j] = 1;
 
             dd[0] = new float[1][,];
-            dd[0][0] = new float[2, 2];
-            for (int i = 0; i < 2; i++)
-                for (int j = 0; j < 2; j++)
+            dd[0][0] = new float[5, 5];
+            for (int i = 0; i < 5; i++)
+                for (int j = 0; j < 5; j++)
                     dd[0][0][i, j] = 1;
             float[][][,] dd3 = new float[1][][,];
             dd3[0] = new float[1][,];
@@ -51,23 +51,26 @@ namespace computational_graph.example
                 { -2.1788f, 0.5684f } };
 
 
-            dynamic data = con2d.Forward(dd);
-             data = ct2d.Forward(data);
+            //   dynamic data = con2d.Forward(dd);
+            dynamic data = ct2d.Forward(dd2);
             util.prirt(data);
 
             MSELoss mSELoss = new MSELoss();
-            var loss = mSELoss.Forward(data, dd2);//左边X,右边Y
+            var loss = mSELoss.Forward(data, dd);//左边X,右边Y
             dynamic grid2 = mSELoss.Backward();
-            grid2 = ct2d.Backward(grid2);
-            // dynamic grid = ct2d.Backward(grid2);
-            //  dynamic grid = mulLayer.backward(grid2);
-            dynamic weight = con2d .backweight(grid2);
-            util.prirt(weight.grid);
-           // util.prirt(grid);
+            dynamic bb = ct2d.backweight(grid2);
+            util.prirt(bb.grid);
+            //grid2 = ct2d.Backward(grid2);
+
+            //// dynamic grid = ct2d.Backward(grid2);
+            ////  dynamic grid = mulLayer.backward(grid2);
+            //dynamic weight = con2d .backweight(grid2);
+            // util.prirt(weight.grid);
+            // util.prirt(grid);
             // dynamic grid2 = mSELoss.Backward();
             // dynamic grid3= ct2d.Backward(grid2);
             // util.prirt(grid3);
-        
+
             //float[] grid = new float[] { 11, 12, 13, 14, 15, 16, 17, 18, 19 };
             //Softmax softmax = new Softmax();
             //var sss = softmax.Forward(new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9});

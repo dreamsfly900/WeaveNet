@@ -45,7 +45,16 @@ namespace computational_graph.Layer
            var inputDatamatrices2 = conv(matrices);
             return inputDatamatrices2;
         }
+        public void update(float lr = 0.1f)
+        {
 
+
+            weights = Matrix.MatrixSub(weights, Matrix.multiply(gridK.grid, lr));
+            basicData = Matrix.MatrixSub(basicData, Matrix.multiply(gridK.basic, lr));
+
+
+
+        }
         private dynamic conv(float[][] matrices)
         {
             float[][] data = new float[matrices.Length][];//outChannels
@@ -82,12 +91,14 @@ namespace computational_graph.Layer
                 }
 
                  var gridd = new { grid = Matrix.T(ss), basic = outputB };
+                gridK = gridd;
                 return gridd;
                    
                
             }
             return grid;
         }
+        dynamic gridK;
         public dynamic backward(dynamic grid)
         {
 

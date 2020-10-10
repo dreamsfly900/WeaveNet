@@ -134,7 +134,7 @@ namespace computational_graph.Layer
 
                             //  float[,] tt=  Matrix.rot180(grid[cc][i]);
                          
-                            v1 = Matrix.Transposeconvolution(inputDatamatrices[cc][j], grid[cc][i], stride, padding);
+                            v1 = Matrix.Transposeconvolution(inputDatamatrices[cc][j], grid[cc][i], stride, padding, Kszie);
                             v1 = Matrix.rot180(v1);
                             if (outputData[i][j] != null)
                                 outputData[i][j] = Matrix.MatrixAdd(outputData[i][j], v1).values;
@@ -175,11 +175,22 @@ namespace computational_graph.Layer
                     //outputB[s] = sum;
                 }
 
-               var  gridd = new { grid = outputDataall, basic = outputB };
+               var gridd = new { grid = outputDataall, basic = outputB };
+                gridK = gridd;
                 return gridd;
             }
         }
+        public void update(float lr = 0.1f)
+        {
+            
 
+                weights = Matrix.MatrixSub(weights, Matrix.multiply(gridK.grid, lr));
+                basicData = Matrix.MatrixSub(basicData, Matrix.multiply(gridK.basic, lr));
+            
+
+
+        }
+        dynamic gridK;
         dynamic backconvY(float[][][,] grid)
         {
             int i;
@@ -266,7 +277,7 @@ namespace computational_graph.Layer
                         //(Height - 1) * Stride - 2 * padding + Size(Height−1)∗Stride−2∗padding + Size
                         float[,] temp;
                           temp= Matrix.rot180(weights[i][j]);
-                        temp = Matrix.Transposeconvolution (inputData[cc][j], temp, stride, padding);
+                        temp = Matrix.Transposeconvolution (inputData[cc][j], temp, stride, padding, Kszie);
                         if (v1 == null)
                             v1 = new float[temp.GetLength(0), temp.GetLength(1)];
                         v1 = Matrix.MatrixAdd(v1, temp).values;

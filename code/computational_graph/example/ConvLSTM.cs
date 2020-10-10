@@ -33,10 +33,11 @@ namespace computational_graph.example
             datay[0] = new float[10][,];
             MSELoss mloss = new MSELoss();
             ConvLSTM convLSTM = new ConvLSTM(10, 10, 3);
-          //  convLSTM.load("radar.bin");
-           
+            //  convLSTM.load("radar.bin");
+
             for (int r = 0; r < files.Length - 11; r++)
             {
+                
                 var loss = 0.0f;
                 for (int t = 0; t < 10; t++)
                 {
@@ -48,30 +49,37 @@ namespace computational_graph.example
                     datay[0][t] = DenseCRF.util.readRADARMatrix(file2);
                     datay[0][t] = ImgUtil.BilinearInterp(datay[0][t], 128, 128);
                 }
-                   var h_next= convLSTM.Forward(datax);
-                     
-                    loss += mloss.Forward(h_next, datay);
-                     
-                        //ImgUtil.savefile(datax[0][t], "testpng/" + (t ) + ".png");
-                        //ImgUtil.savefile(datay[0][t], "testpng/" + (t+10) + ".png");
-                        //ImgUtil.savefile(h_next[0][0], "testpng/a" + (t + 10) + ".png");
+                while (true)
+                {
+                    var star = DateTime.Now;
+                    var h_next = convLSTM.Forward(datax);
 
-                    
+                    loss = mloss.Forward(h_next, datay);
+                    var gird = mloss.Backward();
+                    gird = convLSTM.backward(gird);
+                    Console.WriteLine("lost:" + loss);
+                    convLSTM.update();
+                    //ImgUtil.savefile(datax[0][t], "testpng/" + (t ) + ".png");
+                    //ImgUtil.savefile(datay[0][t], "testpng/" + (t+10) + ".png");
+                    //ImgUtil.savefile(h_next[0][0], "testpng/a" + (t + 10) + ".png");
+
+
                     //var grid = mloss.Backward();
                     //var grid2 = convLSTM.backward(grid);
                     //convLSTM.update();
 
 
-              
-              
-               
+
+
+
 
                     //var grid = mloss.Backward();
                     //var grid2 = convLSTM.backward(grid);
                     //convLSTM.update();
                     //convLSTM.save("radar.bin");
-                //    var end = DateTime.Now;
-                //Console.WriteLine((end - star).TotalMilliseconds);
+                    var end = DateTime.Now;
+                    Console.WriteLine((end - star).TotalMilliseconds);
+                }
             }
         }
         
@@ -155,7 +163,65 @@ namespace computational_graph.example
             //}
             return y;
         }
-        dynamic zroe(float[][][,] x)
+       
+        public dynamic backward(dynamic grid) {
+
+
+            dynamic grid2= tanhLayers[5].Backward(grid);
+
+             convt2d[2].backweight(grid2);
+            grid2 = convt2d[2].Backward(grid2);
+          
+            grid2 = tanhLayers[4].Backward(grid2);
+
+             convt2d[1].backweight(grid2);
+            grid2 = convt2d[1].Backward(grid2);
+
+            grid2 = tanhLayers[3].Backward(grid2);
+
+              convt2d[0].backweight(grid2);
+            grid2 = convt2d[0].Backward(grid2);
+
+
+            grid2 = tanhLayers[2].Backward(grid2);
+
+            grid2= cell[2].Backward(grid2);
+
+            //cell[2].update();
+            convl[2].backweight(grid2);
+            grid2 = convl[2].Backward(grid2);
+
+            grid2 = tanhLayers[1].Backward(grid2);
+
+            grid2 = cell[1].Backward(grid2);
+
+            convl[1].backweight(grid2);
+            grid2 = convl[1].Backward(grid2);
+
+            grid2 = tanhLayers[0].Backward(grid2);
+
+            grid2 = cell[0].Backward(grid2);
+
+            convl[0].backweight(grid2);
+            grid2 = convl[0].Backward(grid2);
+            
+            return grid2;
+        }
+        float lr = 1.0f;
+        public void update()
+        {
+            convt2d[2].update(lr);
+            convt2d[1].update(lr);
+            convt2d[0].update(lr);
+            convl[2].update(lr);
+            convl[1].update(lr);
+            convl[0].update(lr);
+            cell[2].update(lr);
+            cell[1].update(lr);
+            cell[0].update(lr);
+
+        }
+         dynamic zroe(float[][][,] x)
         {
             float[][][,] h_prev = new float[x.Length][][,];
             for (int i = 0; i < x.Length; i++)
@@ -230,7 +296,7 @@ namespace computational_graph.example
         dynamic Xinput, xh_prev, xc_prev, input_gate, forget_gate, cell_memory, output_gate;
         // dynamic dh_prev;
         dynamic ihweight, hhweight;
-        public dynamic backward(dynamic grid)
+        public dynamic Backward(dynamic grid)
         {
 
             var dh = h_next_mul.backwardY(grid);
@@ -257,8 +323,9 @@ namespace computational_graph.example
             return convLayerih.Backward(da);
         }
         float lr = 0.1f;
-        public void update()
+        public void update(float _lr=0.1f )
         {
+            lr = _lr;
             convLayerih.weights = Matrix.MatrixSub(convLayerih.weights, Matrix.multiply(ihweight.grid, lr));
             convLayerih.basicData = Matrix.MatrixSub(convLayerih.basicData, Matrix.multiply(ihweight.basic, lr));
 

@@ -357,32 +357,33 @@ namespace FCN
             int n = matrix.GetLength(1);
             int km = kernel.GetLength(0);
             int kn = kernel.GetLength(1);
-            float[,] extendMatrix = new float[(m* stride) + (2-p) * (km - 1), (n* stride) + (2-p) * (kn - 1)];
-
-            if (m == extendMatrix.GetLength(0) && n == extendMatrix.GetLength(1))
-                puls = false;
-            if (puls)
-            {
-                int s = 0,h=0;
-                for (int i = 0; i < m; i+= stride)
-                {
+            float[,] extendMatrix = extend2(matrix, stride, p, km);
+            //float[,] extendMatrix = new float[(m* stride) + (2-p) * (km - 1), (n* stride) + (2-p) * (kn - 1)];
+           
+            //if (m == extendMatrix.GetLength(0) && n == extendMatrix.GetLength(1))
+            //    puls = false;
+            //if (puls)
+            //{
+            //    int s = 0,h=0;
+            //    for (int i = 0; i < m; i+= stride)
+            //    {
                    
-                    h = 0;
-                    for (int j = 0; j < n; j += stride)
-                    {
-                        int a = i + km - 1;
-                        int b = j + kn - 1;
-                        extendMatrix[a, b] = matrix[s, h];
-                        h++;
-                    }
-                    s++;
-                }
-            }
-            else
-                extendMatrix = matrix;
+            //        h = 0;
+            //        for (int j = 0; j < n; j += stride)
+            //        {
+            //            int a = i + km - 1;
+            //            int b = j + kn - 1;
+            //            extendMatrix[a, b] = matrix[s, h];
+            //            h++;
+            //        }
+            //        s++;
+            //    }
+            //}
+            //else
+            //    extendMatrix = matrix;
 
 
-            return convnValid(extendMatrix, kernel,  1,p);
+            return convnValid(extendMatrix, kernel, 1, 0);
         }
 
         internal static float[][] dot(float[][] left, float[][] right)
@@ -2337,11 +2338,11 @@ namespace FCN
             }
             return temp;
         }
-        public static float[,] Transposeconvolution(float[,] value, float[,] m, int stride, int padding = 0) {
+        public static float[,] Transposeconvolution(float[,] value, float[,] m, int stride, int padding = 0,int klen=0) {
             //if (padding == 0)
             //    padding = m.GetLength(0) / 2 + m.GetLength(0)%2==0?0:1;
            
-            float[,] data= extend(value, stride,padding,m.GetLength(0));
+            float[,] data= extend(value, stride,padding, klen);
             //if (data.GetLength(0) % 2 == 0 && data.GetLength(1) % 2 == 0 && padding==0)
             //    data = sub(data, -1, -1);
             return  Conv(data, m, 1, 0);
@@ -2362,12 +2363,48 @@ namespace FCN
             }
             return data;
         }
-           static float[,] extend(float[,] value,int stride, int padding,int ksize)
+        static float[,] extend2(float[,] value, int stride, int padding, int ksize)
+        {
+            int w = value.GetLength(0);
+            int h = value.GetLength(1);
+            
+            int paddingn = ksize - padding - 1;
+            w = w + (w ) * (stride - 1) + (paddingn * 2);
+            h = h + (h ) * (stride - 1) + (paddingn * 2);
+            //if (w % 2 == 0 && h % 2 == 0)
+            //{
+
+            //    w = w + 1;
+            //    h = h + 1;
+            //    padding += 1;
+            //}
+
+
+            padding = paddingn;
+            //padding = ksize / 2 + ksize % 2 == 0 ? 0 : 1;
+            float[,] data = new float[w, h];
+            int a = 0, b = 0;
+            for (int i = padding; i < w - (padding); i = i + stride)
+            {
+                b = 0;
+                for (int j = padding; j < h - (padding); j = j + stride)
+                {
+
+                    data[i, j] = value[a, b];
+                    b++;
+                }
+                a++;
+            }
+            return data;
+        }
+        static float[,] extend(float[,] value,int stride, int padding,int ksize)
         {
             int w = value.GetLength(0);
             int h=value.GetLength(1);
-            int paddingn = ksize - padding - 1;
-            w = w  + (w - 1) * (stride - 1) + (paddingn * 2);
+            int paddingn = 1;
+             if (ksize>1)
+             paddingn = ksize - padding - 1;
+            w = w  + (w - 1) * (stride - 1) + (paddingn * 2) ;
             h = h   + (h - 1) * (stride - 1) + (paddingn * 2);
             //if (w % 2 == 0 && h % 2 == 0)
             //{

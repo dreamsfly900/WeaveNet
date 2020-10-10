@@ -201,6 +201,7 @@ namespace computational_graph.Layer
             outputB = Matrix.divide(outputB, S4Channels * outChannels);
             //sum / inputData.Length / outChannels
             var gridd = new { grid = data, basic = outputB };
+            gridk = gridd;
             return gridd;
         }
 
@@ -217,7 +218,23 @@ namespace computational_graph.Layer
                 return backconvY(grid);
             }
         }
-        dynamic backfullY(float[][] grid)
+        public void update(float lr = 0.1f)
+        {
+            if (full)
+            {
+                wdata = Matrix.MatrixSub(wdata, Matrix.multiply(gridk.grid, lr));
+                basicData = Matrix.MatrixSub(basicData, Matrix.multiply(gridk.basic, lr));
+            }
+            else
+            {
+
+                weights = Matrix.MatrixSub(weights, Matrix.multiply(gridk.grid, lr));
+                basicData = Matrix.MatrixSub(basicData, Matrix.multiply(gridk.basic, lr));
+            }
+           
+
+        }
+       dynamic backfullY(float[][] grid)
         {
             //if (Activfunction != Activfunction.Null)
             //{
@@ -310,10 +327,11 @@ namespace computational_graph.Layer
                 }
 
                var  gridd = new { grid = outputDataall, basic = outputB };
+                gridk = gridd;
                 return gridd;
             }
         }
-
+        dynamic gridk;
         dynamic backconvY(float[][][,] grid)
         {
             int i;
