@@ -39,7 +39,7 @@ namespace computational_graph.Layer
 
 			return data2;
 		}
-		public dynamic backward(dynamic grid)
+		public dynamic Backward(dynamic grid)
         {
 			return backpooling(grid);
 		}

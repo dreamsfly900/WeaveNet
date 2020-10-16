@@ -7,6 +7,23 @@ using System.Threading.Tasks;
 
 namespace computational_graph.Layer
 {
+
+    
+    public class LeakyReLU : Layer
+    {
+        public float f = 0.1f;
+        public dynamic Backward(dynamic dout)
+        {
+            return Matrix.ReLu(dout);
+        }
+
+        public dynamic Forward(dynamic x )
+        {
+            return Matrix.ReLubackward(x, f);
+        }
+
+        
+    }
     public class ReLuLayer : Layer
     {
         public dynamic Backward(dynamic dout)
@@ -16,10 +33,10 @@ namespace computational_graph.Layer
 
         public dynamic Forward(dynamic x)
         {
-            return Matrix.ReLubackward(x);
+            return Matrix.ReLubackward(x,0);
         }
     }
-    public class TanhLayer: Layer
+    public class TanhLayer : Layer
     {
         dynamic convoutdata;
         public dynamic Forward(dynamic x)

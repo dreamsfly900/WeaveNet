@@ -44,8 +44,10 @@ namespace DenseCRF
                 {
                     if (tremp[x, y] > 0)
                     {
-                        tremp[x, y] = ((tremp[x, y]+10) / 70)+0.5f;
+                        // tremp[x, y] = ((tremp[x, y]) / 70)+0.5f;
+                        tremp[x, y] = ((tremp[x, y]) / 70);
                     }
+                    else { tremp[x, y] = 5 / 70; }
 
                 }
        
@@ -436,6 +438,7 @@ namespace DenseCRF
         }
         public static float[][][,] initweight(int x, int y, int z, int num)
         {
+            System.Threading.Thread.Sleep(1);
             float[][][,] weights = new float[z][][,];
             for (var a = 0; a < z; a++)
             {

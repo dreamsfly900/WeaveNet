@@ -23,12 +23,14 @@ namespace computational_graph.Layer
         public float[] basicData;
         public float[][] wdata;
         int inweightSize;
+        bool basic;
         //Activfunction Activfunction;
         //dynamic ActaLayers;
         public Conv2DLayer(int _stride=1, int _padding=0, int weightswidth = 5, 
-            int innum = 1, int outnum = 6, bool initW = true,bool _full=false, int _inSize = 4)
+            int innum = 1, int outnum = 6, bool initW = true,bool _full=false, int _inSize = 4,bool _basic=true)
             //Activfunction _Activfunction = Activfunction.Null)
         {
+            basic = _basic;
             stride = _stride;
             padding = _padding;
             inChannels = innum;
@@ -70,7 +72,7 @@ namespace computational_graph.Layer
             //d = new Matrix[outnum];
             //v = new Matrix[outnum];
             basicData = new float[outnum];
-            if (initW)
+            if (initW && basic)
             {
                 Random rand = new Random();
                 for (var b = 0; b < outnum; b++)
@@ -312,19 +314,27 @@ namespace computational_graph.Layer
                  );
                 outputDataall = Matrix.divide(outputDataall, inputData.Length* outChannels);
                 float[] outputB = new float[outChannels];
-
-                for (var s = 0; s < outChannels; s++)
+                if (basic)
                 {
-                    float sum = 0f;
-                    for (var cc = 0; cc < inputData.Length; cc++)
+                    for (var s = 0; s < outChannels; s++)
                     {
-                        sum += Matrix.sum(inputData[cc][s]);
 
 
+                   
+                            float sum = 0f;
+                            for (var cc = 0; cc < inputData.Length; cc++)
+                            {
+                                sum += Matrix.sum(inputData[cc][s]);
+
+
+                            }
+                            outputB[s] = sum / inputData.Length / outChannels;
+                        
+
+                        //outputB[s] = sum;
                     }
-                    outputB[s] = sum / inputData.Length / outChannels;
-                    //outputB[s] = sum;
                 }
+             
 
                var  gridd = new { grid = outputDataall, basic = outputB };
                 gridk = gridd;
@@ -432,13 +442,17 @@ namespace computational_graph.Layer
             );
             //if (Activfunction != Activfunction.Null)
             //    outputData = ActaLayers.Forward(outputData);
-            for (var cc = 0; cc < inputData.Length; cc++)
+            if (basic)
             {
-                for (i = 0; i < (outChannels); i++)
+                for (var cc = 0; cc < inputData.Length; cc++)
                 {
-                    outputData[cc][i] = Matrix.MatrixAdd(outputData[cc][i], basicData[i]).values;
+                    for (i = 0; i < (outChannels); i++)
+                    {
+                        outputData[cc][i] = Matrix.MatrixAdd(outputData[cc][i], basicData[i]).values;
+                    }
                 }
             }
+           
               return outputData;
         }
      

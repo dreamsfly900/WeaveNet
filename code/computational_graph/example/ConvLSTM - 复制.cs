@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace computational_graph.example
 {
-    public class ConvLSTMtest
+    public class ConvLSTMtest2
     {
         static void Main(string[] args)
         {
@@ -35,7 +35,7 @@ namespace computational_graph.example
             MSELoss mloss = new MSELoss();
             ConvLSTM convLSTM = new ConvLSTM(3);
             //  convLSTM.load("radar.bin");
-            //convLSTM.load("convLSTM.bin");
+           // convLSTM.load("convLSTM.bin");
             for (int r = 0; r < files.Length - 11; r++)
             {
                 
@@ -49,7 +49,7 @@ namespace computational_graph.example
                     datax[0][t] = anno1;
                     string file2 = files[r + t + 10];
                     datay[0][t] = DenseCRF.util.readRADARMatrix(file2);
-                    datay[0][t] = ImgUtil.BilinearInterp(datay[0][t], 16, 16);
+                    datay[0][t] = ImgUtil.BilinearInterp(datay[0][t], 128, 128);
                  //   ImgUtil.savefile(datay[0][t], "D:/testpng/b" + t + ".png");
                 }
                 while (true)
@@ -58,7 +58,7 @@ namespace computational_graph.example
                     var h_next = convLSTM.Forward(datax);
 
                     for (int ss = 0; ss < 10; ss++)
-                        ImgUtil.savefile2(h_next[0][ss], "D:/testpng/r" + (r*ss)+ss + ".png");
+                        ImgUtil.savefile(h_next[0][ss], "D:/testpng/r" + (r*ss)+ss + ".png");
                     loss = 0f;
                     
                     loss = mloss.Forward(h_next[0][9], datay[0][9]);
@@ -69,7 +69,7 @@ namespace computational_graph.example
                     gird = convLSTM.backward(gird2);
                     Console.WriteLine("lost:" + loss);
                     convLSTM.update();
-                    convLSTM.save("convLSTMaa.bin");
+                    convLSTM.save("convLSTM.bin");
                  
                       
                     var end = DateTime.Now;
@@ -84,11 +84,11 @@ namespace computational_graph.example
         int input_size; int hidden_size; int step=1;
         ConvLSTMCell [] cell;
         Conv2DLayer[] convl;
-       // ConvTranspose2DLayer[] convt2d;
+        ConvTranspose2DLayer[] convt2d;
         computational_graph.Layer.Layer[] tanhLayers;
         List<float[][][,]> listh = new List<float[][][,]>();
         List<float[][][,]> listc = new List<float[][][,]>();
-        Maxpooling[] pooling = new Maxpooling[3];//Averpooling
+        Averpooling[] pooling = new Averpooling[3];//Averpooling
         public ConvLSTM(int weightssize=3,int _step=1)
         {
             int _input_size = 1; int output = 1,
@@ -97,29 +97,27 @@ namespace computational_graph.example
             hidden_size = output;
             step = _step;
             cell =new  ConvLSTMCell[3];
-            convl = new Conv2DLayer[4];
-           // convt2d = new ConvTranspose2DLayer[3];
+            convl = new Conv2DLayer[3];
+            convt2d = new ConvTranspose2DLayer[3];
             tanhLayers = new Layer.Layer[6]; 
             convl[0] = new Conv2DLayer(1, 1, weightssize, _input_size, 8, _basic: false);
-            pooling[0] = new Maxpooling(2);
-            cell[0] = new ConvLSTMCell(8,8,weightssize);
-            tanhLayers[0] = new LeakyReLU();
+            pooling[0] = new Averpooling(2);
+            cell[0] = new ConvLSTMCell(8, 8, weightssize);
+            tanhLayers[0] = new TanhLayer();
             convl[1] = new Conv2DLayer(1, 1, weightssize, 8, 16, _basic: false);
-            pooling[1] = new Maxpooling(2);
-            cell[1] = new ConvLSTMCell(16,16, weightssize);
-            tanhLayers[1] = new LeakyReLU();
+            pooling[1] = new Averpooling(2);
+            cell[1] = new ConvLSTMCell(16, 16, weightssize);
+            tanhLayers[1] = new TanhLayer();
             convl[2] = new Conv2DLayer(1, 1, weightssize, 16, 32, _basic: false);
-            pooling[2] = new Maxpooling(2);
-            cell[2] = new ConvLSTMCell(32,32,weightssize);
-            tanhLayers[2] = new LeakyReLU();
-            convl[3] = new Conv2DLayer(1, 1, weightssize, 32, hidden_size, _basic: false);
+            pooling[2] = new Averpooling(2);
+            cell[2] = new ConvLSTMCell(32, 32, weightssize);
+            tanhLayers[2] = new TanhLayer();
+            convt2d[0] = new ConvTranspose2DLayer(2, 1, weightssize+1, 32, 16, _basic: false);
             tanhLayers[3] = new TanhLayer();
-            //convt2d[0] = new ConvTranspose2DLayer(2, 1, weightssize+1, 32, 16, _basic: false);
-            //tanhLayers[3] = new TanhLayer();
-            //convt2d[1] = new ConvTranspose2DLayer(2, 1, weightssize+1, 16, 8, _basic: false);
-            //tanhLayers[4] = new TanhLayer();
-            //convt2d[2] = new ConvTranspose2DLayer(2, 1, weightssize+1, 8, hidden_size, _basic: false);
-            //tanhLayers[5] = new TanhLayer();
+            convt2d[1] = new ConvTranspose2DLayer(2, 1, weightssize+1, 16, 8, _basic: false);
+            tanhLayers[4] = new TanhLayer();
+            convt2d[2] = new ConvTranspose2DLayer(2, 1, weightssize+1, 8, hidden_size, _basic: false);
+            tanhLayers[5] = new TanhLayer();
 
         }
         public dynamic Forward(float[][][,] x)
@@ -149,7 +147,6 @@ namespace computational_graph.example
                 {
                     h_prev = zroe(y);
                     c_prev = zroe(y);
-
                 }
 
                 y = cell[0].Forward(y, h_prev, c_prev).Item1;
@@ -177,12 +174,12 @@ namespace computational_graph.example
 
                 y = cell[2].Forward(y, h_prev3, c_prev3).Item1;
 
-                y = convl[3].Forward(y);
+                y = convt2d[0].Forward(y);
                 y = tanhLayers[3].Forward(y);
-                //y = convt2d[1].Forward(y);
-                //y = tanhLayers[4].Forward(y);
-                //y = convt2d[2].Forward(y);
-                //y = tanhLayers[5].Forward(y);
+                y = convt2d[1].Forward(y);
+                y = tanhLayers[4].Forward(y);
+                y = convt2d[2].Forward(y);
+                y = tanhLayers[5].Forward(y);
                 list[0][i] = y[0][0];
             }
             return list;
@@ -191,20 +188,20 @@ namespace computational_graph.example
         public dynamic backward(dynamic grid) {
 
 
-            //dynamic grid2= tanhLayers[5].Backward(grid);
+            dynamic grid2= tanhLayers[5].Backward(grid);
 
-            // convt2d[2].backweight(grid2);
-            //grid2 = convt2d[2].Backward(grid2);
+             convt2d[2].backweight(grid2);
+            grid2 = convt2d[2].Backward(grid2);
           
-            //grid2 = tanhLayers[4].Backward(grid2);
+            grid2 = tanhLayers[4].Backward(grid2);
 
-            // convt2d[1].backweight(grid2);
-            //grid2 = convt2d[1].Backward(grid2);
+             convt2d[1].backweight(grid2);
+            grid2 = convt2d[1].Backward(grid2);
 
-           var grid2 = tanhLayers[3].Backward(grid);
+            grid2 = tanhLayers[3].Backward(grid2);
 
-            convl[3].backweight(grid2);
-            grid2 = convl[3].Backward(grid2);
+              convt2d[0].backweight(grid2);
+            grid2 = convt2d[0].Backward(grid2);
 
 
           
@@ -237,8 +234,9 @@ namespace computational_graph.example
         float lr = 0.5f;
         public void update()
         {
-             
-            convl[3].update(lr);
+            convt2d[2].update(lr);
+            convt2d[1].update(lr);
+            convt2d[0].update(lr);
             convl[2].update(lr);
             convl[1].update(lr);
             convl[0].update(lr);
@@ -269,12 +267,12 @@ namespace computational_graph.example
             str = sw.ReadToEnd();
             sw.Close();
             List<object> obj = Newtonsoft.Json.JsonConvert.DeserializeObject<List<object>>(str);
-            convl[3].weights = JsonConvert.DeserializeObject<float[][][,]>(obj[0].ToString());
-            convl[3].basicData= JsonConvert.DeserializeObject<float[]>(obj[1].ToString());
-            //convt2d[1].weights = JsonConvert.DeserializeObject<float[][][,]>(obj[2].ToString());
-            //convt2d[1].basicData = JsonConvert.DeserializeObject<float[]>(obj[3].ToString());
-            //convt2d[0].weights = JsonConvert.DeserializeObject<float[][][,]>(obj[4].ToString());
-            //convt2d[0].basicData = JsonConvert.DeserializeObject<float[]>(obj[5].ToString());
+            convt2d[2].weights = JsonConvert.DeserializeObject<float[][][,]>(obj[0].ToString());
+            convt2d[2].basicData= JsonConvert.DeserializeObject<float[]>(obj[1].ToString());
+            convt2d[1].weights = JsonConvert.DeserializeObject<float[][][,]>(obj[2].ToString());
+            convt2d[1].basicData = JsonConvert.DeserializeObject<float[]>(obj[3].ToString());
+            convt2d[0].weights = JsonConvert.DeserializeObject<float[][][,]>(obj[4].ToString());
+            convt2d[0].basicData = JsonConvert.DeserializeObject<float[]>(obj[5].ToString());
 
             convl[2].weights = JsonConvert.DeserializeObject<float[][][,]>(obj[6].ToString());
             convl[2].basicData = JsonConvert.DeserializeObject<float[]>(obj[7].ToString());
@@ -297,12 +295,12 @@ namespace computational_graph.example
         public void save(string file)
         {
             List<object> objlist = new List<object>();
-            objlist.Add(convl[3].weights);
-            objlist.Add(convl[3].basicData);
-            objlist.Add(convl[3].weights);
-            objlist.Add(convl[3].basicData);
-            objlist.Add(convl[3].weights);
-            objlist.Add(convl[3].basicData);
+            objlist.Add(convt2d[2].weights);
+            objlist.Add(convt2d[2].basicData);
+            objlist.Add(convt2d[1].weights);
+            objlist.Add(convt2d[1].basicData);
+            objlist.Add(convt2d[0].weights);
+            objlist.Add(convt2d[0].basicData);
             objlist.Add(convl[2].weights);
             objlist.Add(convl[2].basicData);
             objlist.Add(convl[1].weights);
@@ -319,246 +317,19 @@ namespace computational_graph.example
             sw.Close();
         }
     }
-   public class ConvLSTMCell2
+   public class ConvLSTMCell
     {
         Conv2DLayer convLayerih;
         Conv2DLayer convLayerhh;
         int input_size; int hidden_size;
-        public ConvLSTMCell2(int weightssize)
+        public ConvLSTMCell(int _input_size, int _hidden_size,int weightssize)
         {
-            input_size = 1;
-            hidden_size = 1;
-            //input_size = _input_size;
-            //hidden_size = _hidden_size;
+            input_size = _input_size;
+            hidden_size = _hidden_size;
             convLayerih = new Conv2DLayer(1, (weightssize/2), weightssize, input_size, hidden_size * 4, _basic: false);
            
             convLayerhh = new Conv2DLayer(1, (weightssize / 2), weightssize, hidden_size, hidden_size * 4, _basic: false);
             
-        }
-        SigmodLayer input_gate_s = new SigmodLayer();
-        SigmodLayer forget_gate_s = new SigmodLayer();
-        SigmodLayer output_gate_s = new SigmodLayer();
-        TanhLayer cell_memory_tl = new TanhLayer();
-        TanhLayer cell_tl = new TanhLayer();
-        //TanhLayer,LeakyReLU,SigmodLayer
-        MulLayer c_next_mul = new MulLayer();
-        MulLayer mulin_gate_mul = new MulLayer();
-        MulLayer h_next_mul = new MulLayer();
-
-        dynamic h_prev, c_prev;
-        public dynamic Forward(float[][][,] input, dynamic h_prevg=null)
-        {
-            //a_vector = np.dot(x, self.weight_ih.T) + np.dot(h_prev, self.weight_hh.T)
-            //a_vector += self.bias_ih + self.bias_hh
-            if (h_prev == null)
-                // h_prev = zroe(input,0.0f);
-                h_prev = input;
-            if (c_prev == null)
-            {
-                c_prev = zroe(input, 0.01f);
-                //c_prev = input;
-            }
-            int len = input[0].Length;
-            Xinput = new float[input.Length][][,];
-            xh_prev = new float[input.Length][][,];
-            xc_prev = new float[input.Length][][,];
-            dynamic outputvalue= new float[input.Length][][,];
-            
-            for (int i = 0; i < len; i++)
-            {
-                for (int a = 0; a < input.Length; a++)
-                {
-                    Xinput[a] = new float[1][,];
-                    Xinput[a][0] = input[a][i];
-
-                    if (i == 0)
-                    {
-                        xh_prev[a] = new float[1][,];
-                        if (h_prevg != null)
-                        {
-                            xh_prev[a][0] = h_prev[a][0];
-                        }
-                        else
-                        xh_prev[a][0] = h_prev[a][i];
-                        //xh_prev[a][0] = input[a][i];
-                        xc_prev[a] = new float[1][,];
-                        xc_prev[a][0] = c_prev[a][i];
-                        
-                    }
-                }
-               // Xinput = input;
-                //xh_prev = h_prev;
-                //xc_prev = c_prev;
-                var ih = convLayerih.Forward(Xinput);
-                var hh = convLayerhh.Forward(xh_prev);
-                var a_vector = Matrix.MatrixAdd(ih, hh);
-
-                List<float[][][,]> liast = Matrix.chunk(a_vector, 4, 1);
-                var a_i = liast[0];
-                var a_f = liast[1];
-                var a_c = liast[2];
-                var a_o = liast[3];
-
-                input_gate = input_gate_s.Forward(a_i);
-                forget_gate = forget_gate_s.Forward(a_f);
-                cell_memory = cell_memory_tl.Forward(a_c);
-                output_gate = output_gate_s.Forward(a_o);
-                var c_next_temp = c_next_mul.Forward(forget_gate, xc_prev);
-                var mulin_gate = mulin_gate_mul.Forward(input_gate, cell_memory);
-                var c_next = Matrix.MatrixAdd(c_next_temp, mulin_gate);
-
-                var h_next = h_next_mul.Forward(output_gate, cell_tl.Forward(c_next));
-                xh_prev = h_next;
-                xc_prev = c_next;
-                for (int a = 0; a < input.Length; a++) {
-                    if (i == 0) {
-                        outputvalue[a] = new float[len][,];
-                       
-                    }
-                    outputvalue[a][i] = h_next[a][0];
-                }
-            }
-
-            // dh_prev = Matrix.zroe(h_next.Length, h_next[0].Length);
-            return outputvalue;//上次的状态，上次的记忆
-        }
-        static dynamic zroe(float[][][,] x,float data=0.0f)
-        {
-            float[][][,] h_prev = new float[x.Length][][,];
-            for (int i = 0; i < x.Length; i++)
-            {
-                h_prev[i] = new float[x[i].Length][,];
-
-                for (int j = 0; j < x[i].Length; j++)
-                {
-                    h_prev[i][j] = new float[x[i][j].GetLength(0), x[i][j].GetLength(1)];
-                    for (int x1 = 0; x1 < x[i][j].GetLength(0); x1++)
-                        for (int y1 = 0; y1 < x[i][j].GetLength(1); y1++)
-                            h_prev[i][j][x1,y1] = data;
-                }
-            }
-            return h_prev;
-        }
-        dynamic Xinput, xh_prev, xc_prev, input_gate, forget_gate, cell_memory, output_gate;
-        // dynamic dh_prev;
-        dynamic ihweight, hhweight;
-        public dynamic Backward(dynamic grid)
-        {
-            dynamic grida=new float[grid.Length][][,];
-            float[][][,] GG = new float[grid.Length][][,];
-            int len = grid[0].Length;
-            for (int i = 0; i < len; i++)
-            {
-
-                for (int a = 0; a < grid.Length; a++)
-                {
-                    // grida[i] = new float[grid[i].Length][,];
-                    GG[a] = new float[1][,];
-                    GG[a][0] = grid[a][i];
-                }
-                //grid = GG;
-                var dh = h_next_mul.backwardY(GG);
-                var d_tanh_c = cell_tl.Backward(dh);
-                //var dc_prev=c_next_mul.backwardY(d_tanh_c);
-
-
-                var d_input_gate = mulin_gate_mul.backward(d_tanh_c);
-                var d_forget_gate = c_next_mul.backward(d_tanh_c);
-                var d_cell_memory = mulin_gate_mul.backwardY(d_tanh_c);
-
-                var d_output_gate = h_next_mul.backward(GG);// d_tanh_c
-                var d_ai = input_gate_s.Backward(d_input_gate);
-                var d_af = forget_gate_s.Backward(d_forget_gate);
-                var d_ao = output_gate_s.Backward(d_output_gate);
-                var d_ac = cell_memory_tl.Backward(d_cell_memory);
-
-                var temp = Matrix.cat(d_ai, d_af, 1);
-                var temp2 = Matrix.cat(d_ac, d_ao, 1);
-                var da = Matrix.cat(temp, temp2, 1);
-                // var daT=Matrix.T(da);
-                ihweight = convLayerih.backweight(da);
-                hhweight = convLayerhh.backweight(da);
-                var aa = convLayerih.Backward(da);
-                for (int a = 0; a < grid.Length; a++)
-                {
-                    if (i == 0)
-                    {
-                        grida[a] = new float[len][,];
-
-                    }
-                    grida[a][i] = aa[a][0];
-                }
-            }
-            return grida;
-        }
-        float lr = 0.1f;
-        public void update(float _lr=0.1f )
-        {
-            lr = _lr;
-            convLayerih.weights = Matrix.MatrixSub(convLayerih.weights, Matrix.multiply(ihweight.grid, lr));
-            convLayerih.basicData = Matrix.MatrixSub(convLayerih.basicData, Matrix.multiply(ihweight.basic, lr));
-
-            convLayerhh.weights = Matrix.MatrixSub(convLayerhh.weights, Matrix.multiply(hhweight.grid, lr));
-            convLayerhh.basicData = Matrix.MatrixSub(convLayerhh.basicData, Matrix.multiply(hhweight.basic, lr));
-
-        }
-        public object[] getWB()
-        {
-            object[] obj = new object[4];
-            obj[0] = convLayerih.weights;
-            obj[1] = convLayerih.basicData;
-            obj[2] = convLayerhh.weights;
-            obj[3] = convLayerhh.basicData;
-            return obj;
-        }
-        public void load(object[] obj)
-        {
-            convLayerih.weights = Newtonsoft.Json.JsonConvert.DeserializeObject<float[][][,]>(obj[0].ToString());
-            convLayerih.basicData = Newtonsoft.Json.JsonConvert.DeserializeObject<float[]>(obj[1].ToString());
-            convLayerhh.weights = Newtonsoft.Json.JsonConvert.DeserializeObject<float[][][,]>(obj[2].ToString());
-            convLayerhh.basicData = Newtonsoft.Json.JsonConvert.DeserializeObject<float[]>(obj[3].ToString());
-        }
-        public void load(string file)
-        {
-            string str = "";
-            System.IO.StreamReader sw = new System.IO.StreamReader(file);
-            str=sw.ReadToEnd();
-            sw.Close();
-            object[] obj= Newtonsoft.Json.JsonConvert.DeserializeObject<object[]>(str);
-            convLayerih.weights = Newtonsoft.Json.JsonConvert.DeserializeObject<float[][][,]>(obj[0].ToString()) ;
-            convLayerih.basicData = Newtonsoft.Json.JsonConvert.DeserializeObject<float[]>(obj[1].ToString());  
-            convLayerhh.weights = Newtonsoft.Json.JsonConvert.DeserializeObject<float[][][,]>(obj[2].ToString()); 
-            convLayerhh.basicData = Newtonsoft.Json.JsonConvert.DeserializeObject<float[]>(obj[3].ToString());
-
-        }
-        public void save(string file)
-        {
-            object[] obj = new object[4];
-            obj[0] = convLayerih.weights;
-            obj[1] = convLayerih.basicData;
-            obj[2] = convLayerhh.weights;
-            obj[3] = convLayerhh.basicData;
-            string str= Newtonsoft.Json.JsonConvert.SerializeObject(obj);
-            System.IO.StreamWriter sw = new System.IO.StreamWriter(file);
-            sw.Write(str);
-            sw.Close();
-        }
-    }
-
-
-    public class ConvLSTMCell
-    {
-        Conv2DLayer convLayerih;
-        Conv2DLayer convLayerhh;
-        int input_size; int hidden_size;
-        public ConvLSTMCell(int _input_size, int _hidden_size, int weightssize)
-        {
-            input_size = _input_size;
-            hidden_size = _hidden_size;
-            convLayerih = new Conv2DLayer(1, (weightssize / 2), weightssize, input_size, hidden_size * 4, _basic: false);
-
-            convLayerhh = new Conv2DLayer(1, (weightssize / 2), weightssize, hidden_size, hidden_size * 4, _basic: false);
-
         }
         SigmodLayer input_gate_s = new SigmodLayer();
         SigmodLayer forget_gate_s = new SigmodLayer();
@@ -631,7 +402,7 @@ namespace computational_graph.example
             return convLayerih.Backward(da);
         }
         float lr = 0.1f;
-        public void update(float _lr = 0.1f)
+        public void update(float _lr=0.1f )
         {
             lr = _lr;
             convLayerih.weights = Matrix.MatrixSub(convLayerih.weights, Matrix.multiply(ihweight.grid, lr));
@@ -661,12 +432,12 @@ namespace computational_graph.example
         {
             string str = "";
             System.IO.StreamReader sw = new System.IO.StreamReader(file);
-            str = sw.ReadToEnd();
+            str=sw.ReadToEnd();
             sw.Close();
-            object[] obj = Newtonsoft.Json.JsonConvert.DeserializeObject<object[]>(str);
-            convLayerih.weights = Newtonsoft.Json.JsonConvert.DeserializeObject<float[][][,]>(obj[0].ToString());
-            convLayerih.basicData = Newtonsoft.Json.JsonConvert.DeserializeObject<float[]>(obj[1].ToString());
-            convLayerhh.weights = Newtonsoft.Json.JsonConvert.DeserializeObject<float[][][,]>(obj[2].ToString());
+            object[] obj= Newtonsoft.Json.JsonConvert.DeserializeObject<object[]>(str);
+            convLayerih.weights = Newtonsoft.Json.JsonConvert.DeserializeObject<float[][][,]>(obj[0].ToString()) ;
+            convLayerih.basicData = Newtonsoft.Json.JsonConvert.DeserializeObject<float[]>(obj[1].ToString());  
+            convLayerhh.weights = Newtonsoft.Json.JsonConvert.DeserializeObject<float[][][,]>(obj[2].ToString()); 
             convLayerhh.basicData = Newtonsoft.Json.JsonConvert.DeserializeObject<float[]>(obj[3].ToString());
 
         }
@@ -677,7 +448,7 @@ namespace computational_graph.example
             obj[1] = convLayerih.basicData;
             obj[2] = convLayerhh.weights;
             obj[3] = convLayerhh.basicData;
-            string str = Newtonsoft.Json.JsonConvert.SerializeObject(obj);
+            string str= Newtonsoft.Json.JsonConvert.SerializeObject(obj);
             System.IO.StreamWriter sw = new System.IO.StreamWriter(file);
             sw.Write(str);
             sw.Close();

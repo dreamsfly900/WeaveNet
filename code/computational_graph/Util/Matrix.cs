@@ -261,14 +261,14 @@ namespace FCN
             }
             return temp;
         }
-        static float ReLubackward(float x)
+        static float ReLubackward(float x,float F)
         {
             if (x <= 0)
-                return 0f;
+                return F*x;
             else
                 return 1.0f;
-          }
-        internal static float[] ReLubackward(float[] input)
+        }
+        internal static float[] ReLubackward(float[] input, float F)
         {
 
             float[] temp = new float[input.GetLength(0)];
@@ -276,12 +276,12 @@ namespace FCN
             {
 
 
-                temp[x] = ReLubackward(input[x]);
+                temp[x] = ReLubackward(input[x],F);
 
             }
             return temp;
         }
-        internal static float[][] ReLubackward(float[][] input)
+        internal static float[][] ReLubackward(float[][] input, float F)
         {
 
             float[][] temp = new float[input.GetLength(0)][];
@@ -290,13 +290,13 @@ namespace FCN
                 temp[x] = new float[input[x].GetLength(0)];
                 for (var y = 0; y < input[x].GetLength(0); y++)
                 {
-                    temp[x][y] = ReLubackward(input[x][y]);
+                    temp[x][y] = ReLubackward(input[x][y],F);
                 }
 
             }
             return temp;
         }
-        internal static float[,] ReLubackward(float[,] Ma)
+        internal static float[,] ReLubackward(float[,] Ma, float F)
         {
             int m = Ma.GetLength(0);
             int n = Ma.GetLength(1);
@@ -309,10 +309,10 @@ namespace FCN
 
             for (int i = 0; i < m; i++)
                 for (int j = 0; j < n; j++)
-                    c[i, j] = ReLubackward(a[i, j]);
+                    c[i, j] = ReLubackward(a[i, j],F);
             return c;
         }
-        internal static float[][][,] ReLubackward(float[][][,] input)
+        internal static float[][][,] ReLubackward(float[][][,] input, float F)
         {
             float[][][,] temp = new float[input.GetLength(0)][][,];
             for (var x = 0; x < input.GetLength(0); x++)
@@ -322,7 +322,7 @@ namespace FCN
                 {
                     if (temp[x][y] == null)
                         temp[x][y] = new float[input[x][y].GetLength(0), input[x][y].GetLength(1)];
-                    temp[x][y] = ReLubackward(input[x][y]);
+                    temp[x][y] = ReLubackward(input[x][y],F);
                 }
             }
             return temp;
@@ -1967,7 +1967,7 @@ namespace FCN
                     //System.Threading.Thread.Sleep(1);
                     float randnum = (((float)rand.Next() / (float)Int32.MaxValue) - 0.5f) * 2; // 产生一个-1到1的随机数
                     bvalue[i, j] = randnum * (float)Math.Sqrt(6.0f / (float)(num));
-                   // bvalue[i, j] = ((float)rand.Next() / Int32.MaxValue) * 0.1f;
+                    //bvalue[i, j] = ((float)rand.Next() / Int32.MaxValue) * 0.1f;
                 }
             return bvalue;
         }
