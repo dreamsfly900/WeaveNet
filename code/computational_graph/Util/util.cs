@@ -47,7 +47,7 @@ namespace DenseCRF
                         // tremp[x, y] = ((tremp[x, y]) / 70)+0.5f;
                         tremp[x, y] = ((tremp[x, y]) / 70);
                     }
-                    else { tremp[x, y] = 5 / 70; }
+                  //  else { tremp[x, y] = 5 / 70; }
 
                 }
        

@@ -35,7 +35,7 @@ namespace computational_graph.example
             MSELoss mloss = new MSELoss();
             ConvLSTM convLSTM = new ConvLSTM(3);
             //  convLSTM.load("radar.bin");
-            //convLSTM.load("convLSTM.bin");
+          //  convLSTM.load("convLSTMaa.bin");
             for (int r = 0; r < files.Length - 11; r++)
             {
                 
@@ -49,7 +49,7 @@ namespace computational_graph.example
                     datax[0][t] = anno1;
                     string file2 = files[r + t + 10];
                     datay[0][t] = DenseCRF.util.readRADARMatrix(file2);
-                    datay[0][t] = ImgUtil.BilinearInterp(datay[0][t], 16, 16);
+                    datay[0][t] = ImgUtil.BilinearInterp(datay[0][t], 128, 128);
                  //   ImgUtil.savefile(datay[0][t], "D:/testpng/b" + t + ".png");
                 }
                 while (true)
@@ -84,42 +84,42 @@ namespace computational_graph.example
         int input_size; int hidden_size; int step=1;
         ConvLSTMCell [] cell;
         Conv2DLayer[] convl;
-       // ConvTranspose2DLayer[] convt2d;
+        ConvTranspose2DLayer[] convt2d;
         computational_graph.Layer.Layer[] tanhLayers;
         List<float[][][,]> listh = new List<float[][][,]>();
         List<float[][][,]> listc = new List<float[][][,]>();
-        Maxpooling[] pooling = new Maxpooling[3];//Averpooling
+        Averpooling[] pooling = new Averpooling[3];//Averpooling
         public ConvLSTM(int weightssize=3,int _step=1)
         {
             int _input_size = 1; int output = 1,
-               //SigmodLayer  TanhLayer
+               //SigmodLayer  TanhLayer,LeakyReLU
                input_size = _input_size;
             hidden_size = output;
             step = _step;
             cell =new  ConvLSTMCell[3];
             convl = new Conv2DLayer[4];
-           // convt2d = new ConvTranspose2DLayer[3];
+            convt2d = new ConvTranspose2DLayer[3];
             tanhLayers = new Layer.Layer[6]; 
-            convl[0] = new Conv2DLayer(1, 1, weightssize, _input_size, 8, _basic: false);
-            pooling[0] = new Maxpooling(2);
+            convl[0] = new Conv2DLayer(1, 1, weightssize, _input_size, 8, bias: false);
+            pooling[0] = new Averpooling(2);
             cell[0] = new ConvLSTMCell(8,8,weightssize);
             tanhLayers[0] = new LeakyReLU();
-            convl[1] = new Conv2DLayer(1, 1, weightssize, 8, 16, _basic: false);
-            pooling[1] = new Maxpooling(2);
+            convl[1] = new Conv2DLayer(1, 1, weightssize, 8, 16, bias: false);
+            pooling[1] = new Averpooling(2);
             cell[1] = new ConvLSTMCell(16,16, weightssize);
             tanhLayers[1] = new LeakyReLU();
-            convl[2] = new Conv2DLayer(1, 1, weightssize, 16, 32, _basic: false);
-            pooling[2] = new Maxpooling(2);
+            convl[2] = new Conv2DLayer(1, 1, weightssize, 16, 32, bias: false);
+            pooling[2] = new Averpooling(2);
             cell[2] = new ConvLSTMCell(32,32,weightssize);
             tanhLayers[2] = new LeakyReLU();
-            convl[3] = new Conv2DLayer(1, 1, weightssize, 32, hidden_size, _basic: false);
-            tanhLayers[3] = new TanhLayer();
-            //convt2d[0] = new ConvTranspose2DLayer(2, 1, weightssize+1, 32, 16, _basic: false);
-            //tanhLayers[3] = new TanhLayer();
-            //convt2d[1] = new ConvTranspose2DLayer(2, 1, weightssize+1, 16, 8, _basic: false);
-            //tanhLayers[4] = new TanhLayer();
-            //convt2d[2] = new ConvTranspose2DLayer(2, 1, weightssize+1, 8, hidden_size, _basic: false);
-            //tanhLayers[5] = new TanhLayer();
+           // convl[3] = new Conv2DLayer(1, 1, weightssize, 32, hidden_size, _basic: false);
+            tanhLayers[3] = new LeakyReLU();
+            convt2d[0] = new ConvTranspose2DLayer(2, 1, weightssize + 1, 32, 16, bias: false);
+            tanhLayers[3] = new LeakyReLU();
+            convt2d[1] = new ConvTranspose2DLayer(2, 1, weightssize + 1, 16, 8, bias: false);
+            tanhLayers[4] = new LeakyReLU();
+            convt2d[2] = new ConvTranspose2DLayer(2, 1, weightssize + 1, 8, hidden_size, bias: false);
+            tanhLayers[5] = new SigmodLayer();
 
         }
         public dynamic Forward(float[][][,] x)
@@ -177,12 +177,12 @@ namespace computational_graph.example
 
                 y = cell[2].Forward(y, h_prev3, c_prev3).Item1;
 
-                y = convl[3].Forward(y);
+                y = convt2d[0].Forward(y);
                 y = tanhLayers[3].Forward(y);
-                //y = convt2d[1].Forward(y);
-                //y = tanhLayers[4].Forward(y);
-                //y = convt2d[2].Forward(y);
-                //y = tanhLayers[5].Forward(y);
+                y = convt2d[1].Forward(y);
+                y = tanhLayers[4].Forward(y);
+                y = convt2d[2].Forward(y);
+                y = tanhLayers[5].Forward(y);
                 list[0][i] = y[0][0];
             }
             return list;
@@ -191,20 +191,20 @@ namespace computational_graph.example
         public dynamic backward(dynamic grid) {
 
 
-            //dynamic grid2= tanhLayers[5].Backward(grid);
+            dynamic grid2 = tanhLayers[5].Backward(grid);
 
-            // convt2d[2].backweight(grid2);
-            //grid2 = convt2d[2].Backward(grid2);
-          
-            //grid2 = tanhLayers[4].Backward(grid2);
+            convt2d[2].backweight(grid2);
+            grid2 = convt2d[2].Backward(grid2);
 
-            // convt2d[1].backweight(grid2);
-            //grid2 = convt2d[1].Backward(grid2);
+            grid2 = tanhLayers[4].Backward(grid2);
 
-           var grid2 = tanhLayers[3].Backward(grid);
+            convt2d[1].backweight(grid2);
+            grid2 = convt2d[1].Backward(grid2);
 
-            convl[3].backweight(grid2);
-            grid2 = convl[3].Backward(grid2);
+            tanhLayers[3].Backward(grid2);
+
+            convt2d[0].backweight(grid2);
+            grid2 = convt2d[0].Backward(grid2);
 
 
           
@@ -237,8 +237,9 @@ namespace computational_graph.example
         float lr = 0.5f;
         public void update()
         {
-             
-            convl[3].update(lr);
+            convt2d[2].update(lr);
+            convt2d[1].update(lr);
+            convt2d[0].update(lr);
             convl[2].update(lr);
             convl[1].update(lr);
             convl[0].update(lr);
@@ -269,12 +270,12 @@ namespace computational_graph.example
             str = sw.ReadToEnd();
             sw.Close();
             List<object> obj = Newtonsoft.Json.JsonConvert.DeserializeObject<List<object>>(str);
-            convl[3].weights = JsonConvert.DeserializeObject<float[][][,]>(obj[0].ToString());
-            convl[3].basicData= JsonConvert.DeserializeObject<float[]>(obj[1].ToString());
-            //convt2d[1].weights = JsonConvert.DeserializeObject<float[][][,]>(obj[2].ToString());
-            //convt2d[1].basicData = JsonConvert.DeserializeObject<float[]>(obj[3].ToString());
-            //convt2d[0].weights = JsonConvert.DeserializeObject<float[][][,]>(obj[4].ToString());
-            //convt2d[0].basicData = JsonConvert.DeserializeObject<float[]>(obj[5].ToString());
+            convt2d[2].weights = JsonConvert.DeserializeObject<float[][][,]>(obj[0].ToString());
+            convt2d[2].basicData= JsonConvert.DeserializeObject<float[]>(obj[1].ToString());
+            convt2d[1].weights = JsonConvert.DeserializeObject<float[][][,]>(obj[2].ToString());
+            convt2d[1].basicData = JsonConvert.DeserializeObject<float[]>(obj[3].ToString());
+            convt2d[0].weights = JsonConvert.DeserializeObject<float[][][,]>(obj[4].ToString());
+            convt2d[0].basicData = JsonConvert.DeserializeObject<float[]>(obj[5].ToString());
 
             convl[2].weights = JsonConvert.DeserializeObject<float[][][,]>(obj[6].ToString());
             convl[2].basicData = JsonConvert.DeserializeObject<float[]>(obj[7].ToString());
@@ -297,12 +298,12 @@ namespace computational_graph.example
         public void save(string file)
         {
             List<object> objlist = new List<object>();
-            objlist.Add(convl[3].weights);
-            objlist.Add(convl[3].basicData);
-            objlist.Add(convl[3].weights);
-            objlist.Add(convl[3].basicData);
-            objlist.Add(convl[3].weights);
-            objlist.Add(convl[3].basicData);
+            objlist.Add(convt2d[2].weights);
+            objlist.Add(convt2d[2].basicData);
+            objlist.Add(convt2d[1].weights);
+            objlist.Add(convt2d[1].basicData);
+            objlist.Add(convt2d[0].weights);
+            objlist.Add(convt2d[0].basicData);
             objlist.Add(convl[2].weights);
             objlist.Add(convl[2].basicData);
             objlist.Add(convl[1].weights);
@@ -330,9 +331,9 @@ namespace computational_graph.example
             hidden_size = 1;
             //input_size = _input_size;
             //hidden_size = _hidden_size;
-            convLayerih = new Conv2DLayer(1, (weightssize/2), weightssize, input_size, hidden_size * 4, _basic: false);
+            convLayerih = new Conv2DLayer(1, (weightssize/2), weightssize, input_size, hidden_size * 4, bias: false);
            
-            convLayerhh = new Conv2DLayer(1, (weightssize / 2), weightssize, hidden_size, hidden_size * 4, _basic: false);
+            convLayerhh = new Conv2DLayer(1, (weightssize / 2), weightssize, hidden_size, hidden_size * 4, bias: false);
             
         }
         SigmodLayer input_gate_s = new SigmodLayer();
@@ -555,9 +556,9 @@ namespace computational_graph.example
         {
             input_size = _input_size;
             hidden_size = _hidden_size;
-            convLayerih = new Conv2DLayer(1, (weightssize / 2), weightssize, input_size, hidden_size * 4, _basic: false);
+            convLayerih = new Conv2DLayer(1, (weightssize / 2), weightssize, input_size, hidden_size * 4, bias: false);
 
-            convLayerhh = new Conv2DLayer(1, (weightssize / 2), weightssize, hidden_size, hidden_size * 4, _basic: false);
+            convLayerhh = new Conv2DLayer(1, (weightssize / 2), weightssize, hidden_size, hidden_size * 4, bias: false);
 
         }
         SigmodLayer input_gate_s = new SigmodLayer();

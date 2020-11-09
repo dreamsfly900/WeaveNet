@@ -132,7 +132,7 @@ namespace computational_graph.example
             cl2 = new Conv2DLayer(1, 0, 5, 6, 12);
             // ap2 = new Averpooling(2);
             ap2 = new Maxpooling(2);
-              cl3 = new Conv2DLayer(innum:12,outnum:10, _inSize: 4,_full:true );
+              cl3 = new Conv2DLayer(in_channels: 12, out_channels: 10, _inSize: 4,_full:true );
         }
         public dynamic Forward(float[][][,] matrices)
         {

@@ -12,16 +12,19 @@ namespace computational_graph.example
         Conv2DLayer cl; 
         Conv2DLayer cl2;
         Conv2DLayer cl3;
+        ConvTranspose2DLayer Tcl1;
         Maxpooling mpl = new Maxpooling();
         Maxpooling mpl2 = new Maxpooling();
         SigmodLayer sl = new SigmodLayer();
         SigmodLayer sl2 = new SigmodLayer();
-        Softmax sl3 = new Softmax();
-        public FCN()
+        SigmodLayer sl3 = new SigmodLayer();
+        Softmax sl4 = new Softmax();
+        public FCN(int weightssize)
         {
-            cl = new Conv2DLayer(1, 5/2, 5, 1, 6);
-            cl2 = new Conv2DLayer(1, 5 / 2, 5, 6, 12);
-            cl3 = new Conv2DLayer(1, 5 / 2, 5, 12, 1);
+            cl = new Conv2DLayer(1, weightssize / 2, weightssize, 1, 6, bias: false);
+            cl2 = new Conv2DLayer(1, weightssize / 2, weightssize, 6, 12, bias: false);
+            cl3 = new Conv2DLayer(1, weightssize / 2, weightssize, 12, 24, bias: false);
+            Tcl1 = new ConvTranspose2DLayer(2, 1, weightssize + 1, 24, 1, bias: false);
         }
         public dynamic Forward(dynamic data)
         {
@@ -33,11 +36,15 @@ namespace computational_graph.example
             data2 = mpl2.Forward(data2);
             data2 = cl3.Forward(data2);
             data2 = sl3.Forward(data2);
+            data2=Tcl1.Forward(data2);
+            data2 = sl4.Forward(data2);
             return data2;
         }
         public dynamic backward(dynamic grid)
         {
-           var grid2= sl3.Backward(grid);
+            var grid2 = sl4.Backward(grid);
+            grid2= Tcl1.Backward(grid2);
+            grid2 = sl3.Backward(grid2);
             grid2 = cl3.Backward(grid2);
             grid2 = mpl2.Backward(grid2);
             grid2 = sl2.Backward(grid2);

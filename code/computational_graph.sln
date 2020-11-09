@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GPU测试", "GPU测试\GPU�
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "Pythontest", "Pythontest\Pythontest.pyproj", "{76B74575-243D-44BD-AD9A-00C1DD311DCC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{03295F20-0B8F-4B90-A981-4BD2CCE11C16}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{D377C4A8-B9AC-4342-A8D4-7D967B65B782}.Release|Any CPU.Build.0 = Release|Any CPU
 		{76B74575-243D-44BD-AD9A-00C1DD311DCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{76B74575-243D-44BD-AD9A-00C1DD311DCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03295F20-0B8F-4B90-A981-4BD2CCE11C16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03295F20-0B8F-4B90-A981-4BD2CCE11C16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03295F20-0B8F-4B90-A981-4BD2CCE11C16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03295F20-0B8F-4B90-A981-4BD2CCE11C16}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

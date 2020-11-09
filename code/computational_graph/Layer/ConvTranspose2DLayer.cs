@@ -27,10 +27,10 @@ namespace computational_graph.Layer
         //dynamic ActaLayers;
         bool basic;
         public ConvTranspose2DLayer(int _stride=1, int _padding=0, int weightswidth = 5, 
-            int innum = 1, int outnum = 6, bool initW = true, int _inSize = 4, bool _basic = true)
+            int innum = 1, int outnum = 6, bool initW = true, int _inSize = 4, bool bias = true)
             //Activfunction _Activfunction = Activfunction.Null)
         {
-            basic = _basic;
+            basic = bias;
             stride = _stride;
             padding = _padding;
             inChannels = innum;

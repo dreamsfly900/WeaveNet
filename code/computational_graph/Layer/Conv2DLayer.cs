@@ -26,19 +26,19 @@ namespace computational_graph.Layer
         bool basic;
         //Activfunction Activfunction;
         //dynamic ActaLayers;
-        public Conv2DLayer(int _stride=1, int _padding=0, int weightswidth = 5, 
-            int innum = 1, int outnum = 6, bool initW = true,bool _full=false, int _inSize = 4,bool _basic=true)
+        public Conv2DLayer(int _stride=1, int _padding=0, int kernel_size = 5, 
+            int in_channels = 1, int out_channels = 6, bool initW = true,bool _full=false, int _inSize = 4,bool bias = true)
             //Activfunction _Activfunction = Activfunction.Null)
         {
-            basic = _basic;
+            basic = bias;
             stride = _stride;
             padding = _padding;
-            inChannels = innum;
-            outChannels = outnum;
-            inweightSize = weightswidth;
+            inChannels = in_channels;
+            outChannels = out_channels;
+            inweightSize = kernel_size;
             full = _full;
             //Activfunction = _Activfunction;
-            init_Kszie(innum, outnum, weightswidth, initW, _full, _inSize);
+            init_Kszie(in_channels, out_channels, kernel_size, initW, _full, _inSize);
         }
        void init_Kszie(int innum = 1, int outnum = 6, int _weightSize = 3,bool initW = true, bool _full = false, int _inSize = 4)
         {

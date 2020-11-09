@@ -487,25 +487,18 @@ namespace FCN
             for (int j = 0; j < y ; j++)
             {
                 temp[j] = new Matrix();
-                temp[j].values = dropout(input[j].values,0.5f);
-            }
-
-
-            
-
-
-
-
+                temp[j].values = dropout( input[j].values,0.5f);
+            } 
             return temp;
 
         }
-         static float[,] dropout(float[,] x, float level)
+        internal static float[,] dropout( float[,] x, float level)
         {
             if (level < 0 || level >= 1)
             {
                 return null;
             }
-
+            float[,] xy = new float[x.GetLength(0), x.GetLength(1)];
             ///raise Exception('Dropout level must be in interval [0, 1[.')
             var retain_prob = 1.0f - level;
             // 我们通过binomial函数，生成与x一样的维数向量。binomial函数就像抛硬币一样，我们可以把每个神经元当做抛硬币一样
@@ -517,12 +510,13 @@ namespace FCN
             {
                 for (int j = 0; j < x.GetLength(1); j++)
                 {
+                    xy[i, j] = sample;
                     x[i,j] *= sample;//#0、1与x相乘，我们就可以屏蔽某些神经元，让它们的值变为0
                                    //print x
                     x[i,j] /= retain_prob;
                 }
             }
-            return x;
+            return xy;
         }
 
        static float binomial(int N, float p, int k)
