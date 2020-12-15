@@ -11,13 +11,13 @@ namespace computational_graph.Layer
     {
         public float dropout_ratio = 0.5f;
         dynamic mask;
-        public dynamic Backward(dynamic dout)
+        public dynamic Forward(dynamic dout)
         {
              mask=Matrix.dropout( dout, dropout_ratio);
             return mask;
         }
  
-        public dynamic Forward(dynamic x)
+        public dynamic Backward(dynamic x)
         {
             return Matrix.multiply(x, mask);
         }

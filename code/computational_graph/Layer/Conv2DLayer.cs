@@ -312,7 +312,7 @@ namespace computational_graph.Layer
 
                 }
                  );
-                outputDataall = Matrix.divide(outputDataall, inputData.Length* outChannels);
+               // outputDataall = Matrix.divide(outputDataall, inputData.Length* outChannels);
                 float[] outputB = new float[outChannels];
                 if (basic)
                 {
@@ -328,9 +328,9 @@ namespace computational_graph.Layer
 
 
                             }
-                            outputB[s] = sum / inputData.Length / outChannels;
-                        
+                        // outputB[s] = sum / inputData.Length / outChannels;
 
+                        outputB[s] = sum / inputData.Length;
                         //outputB[s] = sum;
                     }
                 }
@@ -412,7 +412,7 @@ namespace computational_graph.Layer
             //    ActaLayers = new SigmodLayer();
 
             //}
-            //   for (var cc = 0; cc < inputData.Length; cc++)
+               //for (var cc = 0; cc < inputData.Length; cc++)
             Parallel.For(0, inputData.Length, cc =>
             {
                 outputData[cc] = new float[outChannels][,];

@@ -172,7 +172,7 @@ namespace DenseCRF
             {
                 for (int j = 0; j < dbz.GetLength(1); j++)
                 {
-                    double daya = (dbz[c, j]-0.5)*70;
+                    double daya = (dbz[c, j])*100;
 
                     #region 判断色标
                     if (daya > 0)

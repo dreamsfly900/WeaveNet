@@ -293,16 +293,16 @@ namespace computational_graph.example
         public dynamic backward(dynamic grid)
         {
              
-            var dh  = h_next_mul.backwardY(grid);
+            var dh  = h_next_mul.BackwardY(grid);
             var d_tanh_c = cell_tl.Backward(dh);
              //var dc_prev=c_next_mul.backwardY(d_tanh_c);
             
 
-            var d_input_gate = mulin_gate_mul.backward(d_tanh_c);
-            var d_forget_gate=c_next_mul.backward(d_tanh_c);
-            var d_cell_memory = mulin_gate_mul.backwardY(d_tanh_c);
+            var d_input_gate = mulin_gate_mul.Backward(d_tanh_c);
+            var d_forget_gate=c_next_mul.Backward(d_tanh_c);
+            var d_cell_memory = mulin_gate_mul.BackwardY(d_tanh_c);
 
-            var d_output_gate = h_next_mul.backward(grid);// d_tanh_c
+            var d_output_gate = h_next_mul.Backward(grid);// d_tanh_c
             var d_ai = input_gate_s.Backward(d_input_gate);
             var d_af = forget_gate_s.Backward(d_forget_gate);
             var d_ao = output_gate_s.Backward(d_output_gate);

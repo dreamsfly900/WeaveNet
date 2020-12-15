@@ -492,6 +492,27 @@ namespace FCN
             return temp;
 
         }
+        public static float[][][,] dropout(float[][][,]  input, float level)
+        {
+            float[][][,] temp = new float[input.Length][][,];
+
+
+
+            int y = input.Length;
+            
+            for (int j = 0; j < y; j++)
+            {
+                int a = input[j].Length;
+                temp[j] = new float[a][,];
+                for (int i = 0; i < a; i++)
+                {
+                    temp[j][i] = new float[input[j][i].GetLength(0), input[j][i].GetLength(1)];
+                    temp[j][i] = dropout(input[j][i], level);
+                }
+            }
+            return temp;
+
+        }
         internal static float[,] dropout( float[,] x, float level)
         {
             if (level < 0 || level >= 1)

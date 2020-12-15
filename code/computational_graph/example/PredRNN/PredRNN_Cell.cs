@@ -93,7 +93,7 @@ namespace computational_graph.example.PredRNN
             //combined_o = self.conv_o(combined_o)
             //o = torch.sigmoid(combined_o)
 
-
+            return null;
         }
     }
 }

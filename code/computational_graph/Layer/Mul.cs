@@ -19,7 +19,7 @@ namespace computational_graph.Layer
         }
 
        
-        public dynamic backward(dynamic dout)
+        public dynamic Backward(dynamic dout)
         {
             dynamic dx;
            
@@ -28,7 +28,7 @@ namespace computational_graph.Layer
         }
        
        
-        public dynamic backwardY(dynamic dout)
+        public dynamic BackwardY(dynamic dout)
         {
             dynamic dx;
             
@@ -45,7 +45,7 @@ namespace computational_graph.Layer
             y = _y;
             return x * y;
         }
-        public float backward(float dout)
+        public float Backward(float dout)
         {
             float dx = dout * y;
 

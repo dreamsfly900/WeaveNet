@@ -241,17 +241,17 @@ namespace computational_graph.example
               var dy= convLayerhq.backward(grid);
              hqW=convLayerhq.backweight(grid);
             var DH = dy;
-            var DZHT=  ZHTL.backward(dy);
+            var DZHT=  ZHTL.Backward(dy);
            
-            var dH_tilda = ZHTL.backwardY(dy);
+            var dH_tilda = ZHTL.BackwardY(dy);
             //var Dz1 = ZHTL.backward(DH);
 
-            var Dz = ZHL.backward(DZHT);
+            var Dz = ZHL.Backward(DZHT);
 
             var DRHS=THL.Backward(dH_tilda);
-            var DR = RHM.backward(DRHS);//Add 因为加法的梯度等于本身 所以DRHS=DRH
+            var DR = RHM.Backward(DRHS);//Add 因为加法的梯度等于本身 所以DRHS=DRH
 
-            var DHHS = RHM.backwardY(DRHS);
+            var DHHS = RHM.BackwardY(DRHS);
             var DRS = RSL.Backward(DR);
             var DZS = ZSL.Backward(Dz);
             var temp = Matrix.cat(DZS, DRS, 1);
