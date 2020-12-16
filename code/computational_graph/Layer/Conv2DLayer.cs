@@ -233,8 +233,8 @@ namespace computational_graph.Layer
                 weights = Matrix.MatrixSub(weights, Matrix.multiply(grid.grid, lr));
                 basicData = Matrix.MatrixSub(basicData, Matrix.multiply(grid.basic, lr));
             }
-           
-
+            this.grid = null;
+            
         }
        dynamic backfullY(float[][] grid)
         {
@@ -338,6 +338,13 @@ namespace computational_graph.Layer
 
                var  gridd = new { grid = outputDataall, basic = outputB };
                 this.grid = gridd;
+                //if (this.grid == null)
+                   
+                //else
+                //{
+                //    this.grid = new { grid = Matrix.MatrixAdd(this.grid.grid, gridd.grid), 
+                //        basic = Matrix.MatrixAdd(this.grid.basic, gridd.basic) };
+                //}
                 return gridd;
             }
         }

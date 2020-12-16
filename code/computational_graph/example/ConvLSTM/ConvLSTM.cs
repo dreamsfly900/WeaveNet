@@ -28,9 +28,26 @@ namespace computational_graph.example.ConvLSTM
                 anno1 = ImgUtil.BilinearInterp(anno1, 128, 128);
                 list.Add(anno1);
             }
-            for (int r = 0; r < list.Count - 10; r++)
-            { 
-
+            ConvLSTM convLSTM = new ConvLSTM();
+            while (true)
+            {
+                for (int r = 0; r < list.Count - 10; r++)
+                {
+                    List<float[][][,]> listx = new List<float[][][,]>();
+                    List<float[][][,]> listy = new List<float[][][,]>();
+                    for (int s = 0; s < 10; s++)
+                    {
+                        float[][][,] x = new float[1][][,];
+                        x[0] = new float[1][,];
+                        x[0][0] = list[r + s];
+                        listx.Add(x);
+                        float[][][,] y = new float[1][][,];
+                        y[0] = new float[1][,];
+                        y[0][0] = list[r + s + 1];
+                        listy.Add(y);
+                    }
+                    convLSTM.train(listx, listy);
+                }
             }
         }
        
@@ -143,15 +160,20 @@ namespace computational_graph.example.ConvLSTM
     {
         int intput; int output;
         ConvLSTMCell clstmc;
-        ConvLSTMCell clstmc5;
-        public ConvLSTM(int _intput, int _output)
+        Conv2DLayer conv2D;
+       //   ConvLSTMCell clstmc5;
+        public ConvLSTM()
         {
-            intput = _intput; output = _output;
-
-            clstmc = new ConvLSTMCell(1, 1, 3);
-            clstmc5 = new ConvLSTMCell(1, 1, 5);
+            //int _intput, int _output
+            //intput = _intput; output = _output;
+            conv2D = new Conv2DLayer(1, 1, 3, 1, 64);
+            clstmc = new ConvLSTMCell(64, 1, 3);
+         //   clstmc5 = new ConvLSTMCell(24, 12, 3);
 
         }
+        TanhLayer sl = new TanhLayer();
+        TanhLayer sl2 = new TanhLayer();
+        float lr = 0.1f;
         public void train(List<float[][][,]> listdata, List<float[][][,]> listdatay)
         {
             float[][][,] h = null;
@@ -163,17 +185,32 @@ namespace computational_graph.example.ConvLSTM
             float loss = 0;
             for (int i = 0; i < len; i++)
             {
-                dynamic hh  =clstmc5.Forward(listdata[i], h, c);
-                h = hh.Item1;
-                c= hh.Item2;
-                dynamic hh2 = clstmc.Forward(hh, h2, c2);
+               var data= conv2D.Forward(listdata[i]);
+                data=sl.Forward(data);
+                //var hh = clstmc5.Forward(data, h, c);
+                //h = hh.Item1;
+                //c = hh.Item2;
+                dynamic hh2 = clstmc.Forward(data, h2, c2);
                 h2 = hh2.Item1;
                 c2 = hh2.Item2;
-                loss += mloss.Forward(hh2.Item1, listdatay[i]);
-                var gird = mloss.Backward();
-                var gird2=clstmc.Backward(gird);
-                clstmc5.Backward(gird2);
+                
+                loss += mloss.Forward(h2, listdatay[i]);
+                DenseCRF.ImgUtil.savefile(hh2.Item1[0][0], @"D:\testpng\" + i + ".png");
+               
             }
+            Console.WriteLine("损失误差："+ loss);
+            var gird = mloss.Backward();
+            gird=clstmc.Backward(gird);
+            //   gird= clstmc5.Backward(gird);
+            gird=sl.Backward(gird);
+            conv2D.backweight(gird);
+            //gird = conv2D.Backward(gird);
+            
+           
+            clstmc.update(lr);
+            conv2D.update(lr);
+
+
         }
     }
 }

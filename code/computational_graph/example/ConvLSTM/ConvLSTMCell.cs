@@ -23,14 +23,14 @@ namespace computational_graph.example
 
          
 
-            System.IO.StreamReader sr = new System.IO.StreamReader("Gates.json");
-            var ss = sr.ReadToEnd();
-            sr.Close();
-            JObject jsonobj = Newtonsoft.Json.JsonConvert.DeserializeObject<JObject>(ss);
-            float[][][,] wi = Newtonsoft.Json.JsonConvert.DeserializeObject<float[][][,]>(jsonobj["weight"].ToString());
-            float[] bais = Newtonsoft.Json.JsonConvert.DeserializeObject<float[]>(jsonobj["bias"].ToString());
-            Gates.weights = wi;
-            Gates.basicData = bais;
+            //System.IO.StreamReader sr = new System.IO.StreamReader("Gates.json");
+            //var ss = sr.ReadToEnd();
+            //sr.Close();
+            //JObject jsonobj = Newtonsoft.Json.JsonConvert.DeserializeObject<JObject>(ss);
+            //float[][][,] wi = Newtonsoft.Json.JsonConvert.DeserializeObject<float[][][,]>(jsonobj["weight"].ToString());
+            //float[] bais = Newtonsoft.Json.JsonConvert.DeserializeObject<float[]>(jsonobj["bias"].ToString());
+            //Gates.weights = wi;
+            //Gates.basicData = bais;
 
         }
         SigmodLayer input_gate_s = new SigmodLayer();
@@ -143,17 +143,21 @@ namespace computational_graph.example
                 griddata = grid2;
             //else
             //    griddata = Matrix.MatrixAdd(griddata, grid2);
-            if (grad == null)
-                grad = Gates.backweight(griddata);
-            else {
-                var temp = Gates.backweight(griddata);
-                grad=  new { grid = Matrix.MatrixAdd(grad.grid, temp.grid), basic = Matrix.MatrixAdd(grad.basic, temp.basic) };
-              
-            }
             
-            grid = Gates.Backward(grid2);
+            
+             grad = Gates.backweight(griddata);
+              //grad = new { grid = Matrix.MatrixAdd(grad.grid, temp.grid), basic = Matrix.MatrixAdd(grad.basic, temp.basic) };
 
-            return Matrix.chunk(grid, 2, 1)[0];
+
+           float[][][,] grid3 = Gates.Backward(grid2);
+            float[][][,] grid4 = new float[grid3.Length][][,];
+            //var gg = grid3[0].Skip(0).Take(input_size).ToArray();
+            //.Skip(0)
+            for (int i = 0; i < grid3.Length; i++)
+            {
+                grid4[i] = grid3[i].Take(input_size).ToArray();
+            }
+            return grid4;
         }
         public void update(dynamic lr)
         {

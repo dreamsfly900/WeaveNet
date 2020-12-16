@@ -44,7 +44,7 @@ namespace DenseCRF
                 {
                     if (tremp[x, y] > 0)
                     {
-                         tremp[x, y] = ((tremp[x, y]) / 100);
+                         tremp[x, y] = ((tremp[x, y]) / 70);
                      //   tremp[x, y] = ((tremp[x, y]) / 70);
                     }
                   //  else { tremp[x, y] = 5 / 70; }
@@ -438,16 +438,17 @@ namespace DenseCRF
         }
         public static float[][][,] initweight(int x, int y, int z, int num)
         {
-            System.Threading.Thread.Sleep(1);
+            
             float[][][,] weights = new float[z][][,];
             for (var a = 0; a < z; a++)
             {
+                System.Threading.Thread.Sleep(1);
                 weights[a] = new float[num][,];
                 for (var b = 0; b < num; b++)
                 {
                     weights[a][b] = new float[x, y];
                     weights[a][b]=Matrix. randinit(weights[a][b], z+ num);
-                    System.Threading.Thread.Sleep(0);
+                    System.Threading.Thread.Sleep(1);
                     //缺少随机填充初始化
                 }
 
