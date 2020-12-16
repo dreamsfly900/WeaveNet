@@ -89,6 +89,9 @@
     <None Include="Gates.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Gatesa.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="data\train-images.idx3-ubyte" />
     <None Include="data\train-labels.idx1-ubyte" />

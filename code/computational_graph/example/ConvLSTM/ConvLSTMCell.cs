@@ -43,17 +43,17 @@ namespace computational_graph.example
         MulLayer mulin_gate_mul = new MulLayer();
         MulLayer h_next_mul = new MulLayer();
 
-
+        public dynamic grad;
         public (dynamic, dynamic) Forward(float[][][,] input, float[][][,] prev_hidden, float[][][,] prev_cell)
         {
             //a_vector = np.dot(x, self.weight_ih.T) + np.dot(h_prev, self.weight_hh.T)
             //a_vector += self.bias_ih + self.bias_hh
-           
+
             if (prev_hidden is null)
             {
                 prev_hidden = new float[input.Length][][,];
                 prev_cell = new float[input.Length][][,];
-                for (int i = 0; i < input.Length; i++) 
+                for (int i = 0; i < input.Length; i++)
                 {
                     prev_hidden[i] = new float[hidden_size][,];
                     prev_cell[i] = new float[hidden_size][,];
@@ -64,6 +64,10 @@ namespace computational_graph.example
                     }
                 }
             }
+            //else {
+            //    prev_hidden = copy(prev_hidden);
+            //    prev_cell = copy(prev_cell);
+            //}
 
             var stacked_inputs=  Matrix.cat(input, prev_hidden, 1);
             var gates = Gates.Forward(stacked_inputs);
@@ -83,31 +87,79 @@ namespace computational_graph.example
             // dh_prev = Matrix.zroe(h_next.Length, h_next[0].Length);
             return (hidden, cell);//上次的状态，上次的记忆
         }
-      
+        dynamic copy(float[][][,]  input)
+        {
+             float[][][,]  prev_hidden = new float[input.Length][][,];
+            
+            for (int i = 0; i < input.Length; i++)
+            {
+                prev_hidden[i] = new float[hidden_size][,];
+                 
+                for (int j = 0; j < hidden_size; j++)
+                {
+                    prev_hidden[i][j] = new float[input[0][0].GetLength(0), input[0][0].GetLength(1)];
+                    for (int a = 0; a < input[0][0].GetLength(0); a++)
+                        for (int b = 0; b < input[0][0].GetLength(1); b++)
+                            prev_hidden[i][j][a, b] = input[i][j][a, b];
+                }
+            }
+            return prev_hidden;
+        }
+        dynamic griddata;
         public dynamic Backward(dynamic grid)
         {
             dynamic out_gate = h_next_mul.Backward(grid);
             out_gate=output_gate_s.Backward(out_gate);
+            
+            
 
             dynamic cell= h_next_mul.BackwardY(grid);
             cell = cell_tl.Backward(cell);
+            //var prev_cell = mulin_gate_mul.BackwardY(cell);
             dynamic remember_gate = mulin_gate_mul.Backward(cell);
             remember_gate=forget_gate_s.Backward(remember_gate);
-
+     
+            
+            
 
             dynamic in_gate = c_next_mul.Backward(cell);
             in_gate=input_gate_s.Backward(in_gate);
+
+        
+              
+            
+
             dynamic cell_gate = c_next_mul.BackwardY(cell);
             cell_gate=cell_gate_tl.Backward(cell_gate);
+
+          
+              
+           
 
             var ir= Matrix.cat(in_gate, remember_gate, 1);
             var iro = Matrix.cat(ir, out_gate, 1);
             var grid2 = Matrix.cat(iro, cell_gate, 1);
-            var weight= Gates.backweight(grid2);
-            grid2 = Gates.Backward(grid2);
-            return grid2;
+            //if (griddata == null)
+                griddata = grid2;
+            //else
+            //    griddata = Matrix.MatrixAdd(griddata, grid2);
+            if (grad == null)
+                grad = Gates.backweight(griddata);
+            else {
+                var temp = Gates.backweight(griddata);
+                grad=  new { grid = Matrix.MatrixAdd(grad.grid, temp.grid), basic = Matrix.MatrixAdd(grad.basic, temp.basic) };
+              
+            }
+            
+            grid = Gates.Backward(grid2);
+
+            return Matrix.chunk(grid, 2, 1)[0];
         }
-     
+        public void update(dynamic lr)
+        {
+            Gates.grid = grad;
+            Gates.update(lr);
+        }
     }
 
     //public class ConvLSTMCell

@@ -12,9 +12,18 @@ namespace computational_graph.loss
         dynamic dx, dy;
         public float Forward(dynamic DX, dynamic DY)
         {
-            dx = DX;
-            dy = DY;
-            return MSE(DX, DY);
+           var lost= MSE(DX, DY);
+           // if (dx == null)
+            {
+                dx = DX;
+                dy = DY;
+            }
+            //else
+            //{
+            //    dx = Matrix.MatrixAdd(dx, DX);
+            //    dy = Matrix.MatrixAdd(dy, DY);
+            //}
+            return lost;
         }
         public dynamic Backward()
         {

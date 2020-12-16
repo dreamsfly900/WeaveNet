@@ -69,9 +69,9 @@ if __name__ == '__main__':
    outputa=torch.ones(1,1,5,5)
    
    #m=nn.ConvTranspose2d(1,1,3,2,1)
-   #m2=nn.Conv2d(1,1,2,1,0)
+   m2=nn.Conv2d(1,1,2,1,0)
     
-   ##output=m2(input)
+   output=m2(input)
    #output=m(input)
   
   
@@ -86,32 +86,7 @@ if __name__ == '__main__':
    #for p in m2.parameters():
    #     print(p.data)
   
-   lstm=ConvLSTMCell(1,1,3)
-   h,c=lstm.init_hidden(1,1,(5,5))
-   loss=nn.MSELoss()
-   data,c2=lstm(input2,h,c)
-   c=c2
-   h=data
-   loss=loss(data,outputa)
-   #print( loss)
-   loss.backward()
-   print(lstm.Wxi.weight.grad)
-   print(lstm.Wxi.bias.grad)
-   print(lstm.Whi.weight.grad)
-   #print(lstm.Whi.bias.grad)
-   print(lstm.Wxf.weight.grad)
-   print(lstm.Wxf.bias.grad)
-   print(lstm.Whf.weight.grad)
-   #print(lstm.Whf.bias.grad)
-   print(lstm.Wxc.weight.grad)
-   print(lstm.Wxc.bias.grad)
-   print(lstm.Whc.weight.grad)
-   #print(lstm.Whc.bias.grad)
-   print(lstm.Wxo.weight.grad)
-   print(lstm.Wxo.bias.grad)
-   print(lstm.Who.weight.grad)
-   #print(lstm.Who.bias.grad)
-   print(lstm.Wci.grad)
+  
    
    #output.backward()
    #input4.backward()

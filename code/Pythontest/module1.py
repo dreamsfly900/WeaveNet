@@ -61,8 +61,8 @@ if __name__ == '__main__':
     b, c, h, w = 1,1,5,5
     d = 1           # hidden state size
     lr = 1e-1       # learning rate
-    T = 1           # sequence length
-    max_epoch = 20  # number of epochs
+    T = 2           # sequence length
+    max_epoch = 1  # number of epochs
 
     # set manual seed
     torch.manual_seed(0)
@@ -70,24 +70,43 @@ if __name__ == '__main__':
     print('Instantiate model')
     model = ConvLSTMCell(c, d)
     print(repr(model))
-
+    Gatesa = nn.Conv2d(1,1,3,1,1)
+    model.wjson("Gatesa",{"weight":Gatesa.weight.tolist(),"bias": Gatesa.bias.tolist()})
     print('Create input and target Variables')
+    torch.set_printoptions(precision=8)
     #x = Variable(torch.rand(T, b, c, h, w))
     #y = Variable(torch.randn(T, b, d, h, w))
     x = Variable(torch.ones(T, b, c, h, w))
     y = Variable(torch.ones(T, b, d, h, w))
-    
+    model = ConvLSTMCell(c, d)
     print('Create a MSE criterion')
     loss_fn = nn.MSELoss()
-
+    loss_fn2 = nn.MSELoss()
     print('Run for', max_epoch, 'iterations')
     for epoch in range(0, max_epoch):
         state = None
         loss = 0
+        loss2=0
         for t in range(0, T):
-            state = model(x[t], state)
-            loss += loss_fn(state[0], y[t])
+            xt=Gatesa(x[0])
+            #xv= f.sigmoid(xt);
+            state2 = model(x[t], state)
+            #if state is None: 
+            state = (
+                    Variable(state2[0]),
+                    Variable(state2[1])
+                )
+            
+            loss += loss_fn(state2[0], y[0])
+            loss2 += loss_fn2(xt, y[0])
+            #model.zero_grad()
 
+        # compute new grad parameters through time!
+            #loss.backward()
+
+        # learning_rate step against the gradient
+            #for p in model.parameters():
+            #    print(p.grad.data)
         print(' > Epoch {:2d} loss: {:.3f}'.format((epoch+1), loss.data))
 
         # zero grad parameters
@@ -95,9 +114,11 @@ if __name__ == '__main__':
 
         # compute new grad parameters through time!
         loss.backward()
-
+        loss2.backward()
         # learning_rate step against the gradient
         for p in model.parameters():
+            print(p.grad.data)
+        for p in Gatesa.parameters():
             print(p.grad.data)
             #p.data.sub_(p.grad.data * lr)
 
