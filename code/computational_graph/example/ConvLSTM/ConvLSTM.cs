@@ -16,20 +16,26 @@ namespace computational_graph.example.ConvLSTM
   
         static void Main(string[] args)
         {
-            
-            //var ww=Gates.backweight(gird);
-            string[] files = System.IO.Directory.GetFiles("test");
+          // train();
+            ceshi();
+           //var ww=Gates.backweight(gird);
+
+        }
+        static void train()
+        {
+            string[] files = System.IO.Directory.GetFiles(@"D:\testpng\res");
             files = files.OrderBy(p => p).ToArray();
             List<float[,]> list = new List<float[,]>();
             for (int r = 0; r < files.Length; r++)
             {
-                String file = files[r ];
+                String file = files[r];
                 float[,] anno1 = DenseCRF.util.readRADARMatrix(file);
-                anno1 = ImgUtil.BilinearInterp(anno1, 128, 128);
+                //anno1 = ImgUtil.BilinearInterp(anno1, 128, 128);
                 list.Add(anno1);
             }
             ConvLSTM convLSTM = new ConvLSTM();
-            while (true)
+            convLSTM.load("ceshi.bin");
+            //while (true)
             {
                 for (int r = 0; r < list.Count - 10; r++)
                 {
@@ -48,9 +54,9 @@ namespace computational_graph.example.ConvLSTM
                     }
                     convLSTM.train(listx, listy);
                 }
+                convLSTM.save("ceshi.bin");
             }
         }
-       
         static dynamic zroe(float[][][,] x,int len)
         {
             float[][][,] h_prev = new float[x.Length][][,];
@@ -86,73 +92,38 @@ namespace computational_graph.example.ConvLSTM
             return h_prev;
         }
 
-        void ceshi()
+       static void ceshi()
         {
-            double aa = -5.0051e-02;
-            Conv2DLayer Gates = new Conv2DLayer(1, (3 / 2), 3, 1, 1, bias: true);
-            System.IO.StreamReader sr = new System.IO.StreamReader("Gatesa.json");
-            var ss = sr.ReadToEnd();
-            sr.Close();
-            JObject jsonobj = Newtonsoft.Json.JsonConvert.DeserializeObject<JObject>(ss);
-            float[][][,] wi = Newtonsoft.Json.JsonConvert.DeserializeObject<float[][][,]>(jsonobj["weight"].ToString());
-            float[] bais = Newtonsoft.Json.JsonConvert.DeserializeObject<float[]>(jsonobj["bias"].ToString());
-            Gates.weights = wi;
-            Gates.basicData = bais;
-
-            ConvLSTMCell clstmc = new ConvLSTMCell(1, 1, 3);
-            ConvLSTMCell clstmc2 = new ConvLSTMCell(1, 1, 3);
-            float[][][,] x = new float[1][][,];
-            x[0] = new float[1][,];
-            x[0][0] = new float[5, 5];
-            x = ones(x);
-            float[][][,] y = ones(x);
-            float[][][,] h = null;
-            float[][][,] c = null;
-            SigmodLayer sf = new SigmodLayer();
-            //x=Gates.Forward(x);
-            MSELoss mloss = new MSELoss();
-            MSELoss mloss2 = new MSELoss();
-            float loss = 0;
-            float loss2 = 0;
-            float[][][,] gird = null;
-            float[][][,] gird2 = null;
-            for (int s = 0; s < 2; s++)
+            string[] files = System.IO.Directory.GetFiles(@"D:\testpng\res");
+            files = files.OrderBy(p => p).ToArray();
+            List<float[,]> list = new List<float[,]>();
+            var r = 0;
+            for ( r = 0; r < files.Length; r++)
             {
-
-                var datan = clstmc.Forward(x, h, c);
-                h = datan.Item1;
-                c = datan.Item2;
-                //  var data = Gates.Forward(x);
-                //datan = sf.Forward(datan);
-                //loss2 += mloss2.Forward(data,y);
-                loss += mloss.Forward(datan.Item1, y);
-                //if (gird2 is null)
-                //    gird2 = mloss2.Backward();
-                //else
-                //{
-                //    gird2 = Matrix.MatrixAdd(gird2, mloss2.Backward());
-                //    //  gird = Matrix.MatrixAdd(gird, c);
-
-                //   var gg= Gates.backweight(gird2);
-                //}
-                // if (gird is null)
-                gird = mloss.Backward();
-                //else
-                {
-                    //  gird = Matrix.MatrixAdd(gird, mloss.Backward());
-                    //  gird = Matrix.MatrixAdd(gird, c);
-                    // gird = mloss.Backward();
-                    clstmc.Backward(gird);
-
-                }
-
-
-
-
+                String file = files[r];
+                float[,] anno1 = DenseCRF.util.readRADARMatrix(file);
+                DenseCRF.ImgUtil.savefile(anno1, @"D:\testpng\A" + r + ".png");
+                //anno1 = ImgUtil.BilinearInterp(anno1, 128, 128);
+                list.Add(anno1);
             }
-
-            gird = sf.Backward(gird);
-            var grad = Gates.backweight(gird);
+            ConvLSTM convLSTM = new ConvLSTM();
+            convLSTM.load("ceshi.bin");
+           
+            List<float[][][,]> listx = new List<float[][][,]>();
+            
+          //  for (int r = 0; r < list.Count - 10; r++)
+            {
+              
+                for (int s = 0; s < 10; s++)
+                {
+                    float[][][,] x = new float[1][][,];
+                    x[0] = new float[1][,];
+                    x[0][0] = list[ s];
+                    listx.Add(x);
+                    
+                }
+                convLSTM.test(listx);
+            }
 
         }
     }
@@ -161,14 +132,16 @@ namespace computational_graph.example.ConvLSTM
         int intput; int output;
         ConvLSTMCell clstmc;
         Conv2DLayer conv2D;
-       //   ConvLSTMCell clstmc5;
+        Conv2DLayer conv2D2;
+        ConvLSTMCell clstmc5;
         public ConvLSTM()
         {
             //int _intput, int _output
             //intput = _intput; output = _output;
-            conv2D = new Conv2DLayer(1, 1, 3, 1, 64);
-            clstmc = new ConvLSTMCell(64, 1, 3);
-         //   clstmc5 = new ConvLSTMCell(24, 12, 3);
+            conv2D = new Conv2DLayer(1, 1, 3, 1, 128);
+            clstmc = new ConvLSTMCell(128, 1, 3);
+            conv2D2 = new Conv2DLayer(1, 1, 3, 16, 1);
+            clstmc5 = new ConvLSTMCell(32, 1, 3);
 
         }
         TanhLayer sl = new TanhLayer();
@@ -185,31 +158,107 @@ namespace computational_graph.example.ConvLSTM
             float loss = 0;
             for (int i = 0; i < len; i++)
             {
-               var data= conv2D.Forward(listdata[i]);
+                DenseCRF.ImgUtil.savefile(listdata[i][0][0], @"D:\testpng\A" + i + ".png");
+                var data= conv2D.Forward(listdata[i]);
                 data=sl.Forward(data);
-                //var hh = clstmc5.Forward(data, h, c);
-                //h = hh.Item1;
-                //c = hh.Item2;
+               
                 dynamic hh2 = clstmc.Forward(data, h2, c2);
                 h2 = hh2.Item1;
                 c2 = hh2.Item2;
-                
+                //var data2=conv2D2.Forward(h2);
+                //data2 = sl2.Forward(data2);
+                //var hh = clstmc5.Forward(data2, h, c);
+                //h = hh.Item1;
+                //c = hh.Item2;
                 loss += mloss.Forward(h2, listdatay[i]);
                 DenseCRF.ImgUtil.savefile(hh2.Item1[0][0], @"D:\testpng\" + i + ".png");
                
             }
             Console.WriteLine("损失误差："+ loss);
             var gird = mloss.Backward();
-            gird=clstmc.Backward(gird);
-            //   gird= clstmc5.Backward(gird);
-            gird=sl.Backward(gird);
+           
+           // gird= clstmc5.Backward(gird);
+            //gird = sl2.Backward(gird);
+            //conv2D2.backweight(gird);
+            //gird = conv2D2.Backward(gird);
+            gird = clstmc.Backward(gird); 
+            gird =sl.Backward(gird);
             conv2D.backweight(gird);
             //gird = conv2D.Backward(gird);
-            
-           
+          
+
             clstmc.update(lr);
             conv2D.update(lr);
+            //conv2D2.update(lr);
+         //   clstmc5.update(lr);
+          
+        }
+        public void test(List<float[][][,]> listdata)
+        {
+            float[][][,] h = null;
+            float[][][,] c = null;
+            float[][][,] h2 = null;
+            float[][][,] c2 = null;
+            int len = listdata.Count;
+            // MSELoss mloss = new MSELoss();
+            dynamic lostdata=null ;
+            float lh = 0;
+            while (lh < 10)
+            {
+                for (int i = 0; i < len; i++)
+                {
+                    // DenseCRF.ImgUtil.savefile(listdata[i][0][0], @"D:\testpng\A" + i + ".png");
+                    var data = conv2D.Forward(listdata[i]);
+                    data = sl.Forward(data);
 
+                    dynamic hh2 = clstmc.Forward(data, h2, c2);
+                    h2 = hh2.Item1;
+                    c2 = hh2.Item2;
+                    //var data2=conv2D2.Forward(h2);
+                    //data2 = sl2.Forward(data2);
+                    //var hh = clstmc5.Forward(data2, h, c);
+                    //h = hh.Item1;
+                    //c = hh.Item2;
+                    //   loss += mloss.Forward(h2, listdatay[i]);
+                    lostdata = h2;
+                   
+
+                }
+                DenseCRF.ImgUtil.savefile(lostdata[0][0], @"D:\testpng\B" + lh + ".png");
+                listdata.RemoveAt(0);
+                listdata.Add(lostdata);
+                lh++;
+            }
+           
+
+        }
+        public void save(string file)
+        {
+            List<object> listwb = new List<object>();
+            listwb.AddRange(clstmc5.getWB());
+            listwb.AddRange(clstmc.getWB());
+            listwb.Add(conv2D.weights);
+            listwb.Add(conv2D.basicData);
+            listwb.Add(conv2D2.weights);
+            listwb.Add(conv2D2.basicData);
+            string str = Newtonsoft.Json.JsonConvert.SerializeObject(listwb);
+            System.IO.StreamWriter sw = new System.IO.StreamWriter(file);
+            sw.Write(str);
+            sw.Close();
+        }
+        public void load(string file)
+        {
+            string str = "";
+            System.IO.StreamReader sw = new System.IO.StreamReader(file);
+            str = sw.ReadToEnd();
+            sw.Close();
+            object[] obj = Newtonsoft.Json.JsonConvert.DeserializeObject<object[]>(str);
+            clstmc5.load(obj[0], obj[1]);
+            clstmc.load(obj[2], obj[3]);
+            conv2D.weights = Newtonsoft.Json.JsonConvert.DeserializeObject<float[][][,]>(obj[4].ToString());
+            conv2D.basicData = Newtonsoft.Json.JsonConvert.DeserializeObject<float[]>(obj[5].ToString());
+            conv2D2.weights = Newtonsoft.Json.JsonConvert.DeserializeObject<float[][][,]>(obj[6].ToString());
+            conv2D2.basicData = Newtonsoft.Json.JsonConvert.DeserializeObject<float[]>(obj[7].ToString());
 
         }
     }

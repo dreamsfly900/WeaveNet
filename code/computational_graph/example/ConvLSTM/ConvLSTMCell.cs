@@ -164,6 +164,20 @@ namespace computational_graph.example
             Gates.grid = grad;
             Gates.update(lr);
         }
+        public object[] getWB()
+        {
+            object[] obj = new object[2];
+            obj[0] = Gates.weights;
+            obj[1] = Gates.basicData;
+          
+            return obj;
+        }
+        public void load(object weights, object basicData)
+        {
+            Gates.weights = Newtonsoft.Json.JsonConvert.DeserializeObject<float[][][,]>(weights.ToString());
+            Gates.basicData = Newtonsoft.Json.JsonConvert.DeserializeObject<float[]>(basicData.ToString());
+             
+        }
     }
 
     //public class ConvLSTMCell
@@ -176,7 +190,7 @@ namespace computational_graph.example
     //        input_size = _input_size;
     //        hidden_size = _hidden_size;
     //        convLayerih = new Conv2DLayer(1, (weightssize / 2), weightssize, input_size, hidden_size * 4, bias: true);
-            
+
 
     //         convLayerhh = new Conv2DLayer(1, (weightssize / 2), weightssize, hidden_size, hidden_size * 4, bias: false);
 
@@ -339,7 +353,7 @@ namespace computational_graph.example
     //        Who = new Conv2DLayer(1, padding, in_channels: hidden_size, out_channels: hidden_size, kernel_size: weightssize, bias: false);
 
     //    }
-      
+
     //    SigmodLayer sl = new SigmodLayer();
     //    SigmodLayer sl2 = new SigmodLayer();
     //    SigmodLayer sl3 = new SigmodLayer();
@@ -351,7 +365,7 @@ namespace computational_graph.example
     //    MulLayer cfcmul = new MulLayer();
     //    MulLayer cithxcmul = new MulLayer();
     //    MulLayer new_hmul = new MulLayer();
-        
+
 
     //    public (dynamic, (dynamic, dynamic)) Forward(float[][][,] input, (dynamic, dynamic) hidden_state)
     //    {
@@ -367,21 +381,21 @@ namespace computational_graph.example
     //        }
     //        var Wxiconv = Wxi.Forward(input);
     //        var Whiconv = Whi.Forward(hidden);
-            
+
     //        var cWci = cWcimul.Forward(c, Wci);
     //        var sumwwc = Matrix.MatrixAdd(Matrix.MatrixAdd(Wxiconv, Whiconv), cWci);
     //        var ci = sl.Forward(sumwwc);
     //        //ci = torch.sigmoid(self.Wxi(input) + self.Whi(hidden) + c * self.Wci)
     //        var Wxfconv = Wxf.Forward(input);
     //        var Whfconv = Whf.Forward(hidden);
-           
+
     //        var cWcf = cWcfmul.Forward(c, Wcf);
     //        var sumcf = Matrix.MatrixAdd(Matrix.MatrixAdd(Wxfconv, Whfconv), cWcf);
     //        var cf = sl2.Forward(sumcf);
     //        //cf = torch.sigmoid(self.Wxf(input) + self.Whf(hidden) + c * self.Wcf)
     //        var Wxoconv = Wxo.Forward(input);
     //        var Whoconv = Who.Forward(hidden);
-           
+
     //        var cWco = cWcomul.Forward(c, Wco);
     //        var sumco = Matrix.MatrixAdd(Matrix.MatrixAdd(Wxoconv, Whoconv), cWco);
     //        var co = sl3.Forward(sumco);
@@ -430,7 +444,7 @@ namespace computational_graph.example
     //        Wxi.backweight(sumwwcgrid);
     //        Whi.backweight(sumwwcgrid);
 
-           
+
 
     //       var Whcgrid= th.Backward(thxcgird);
     //       Wxc.backweight(Whcgrid); 
