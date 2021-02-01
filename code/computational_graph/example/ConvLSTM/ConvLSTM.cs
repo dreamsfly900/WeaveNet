@@ -16,7 +16,7 @@ namespace computational_graph.example.ConvLSTM
   
         static void Main(string[] args)
         {
-          // train();
+           ///train();
             ceshi();
            //var ww=Gates.backweight(gird);
 
@@ -114,7 +114,7 @@ namespace computational_graph.example.ConvLSTM
           //  for (int r = 0; r < list.Count - 10; r++)
             {
               
-                for (int s = 0; s < 10; s++)
+                for (int s = 5; s < 15; s++)
                 {
                     float[][][,] x = new float[1][][,];
                     x[0] = new float[1][,];
@@ -203,32 +203,61 @@ namespace computational_graph.example.ConvLSTM
             // MSELoss mloss = new MSELoss();
             dynamic lostdata=null ;
             float lh = 0;
-            while (lh < 10)
+            //List<float[][][,]> listh = new List<float[][][,]>();
+            //List<float[][][,]> listc = new List<float[][][,]>();
+            //for (int i = 0; i < 20; i++)
+            //{
+            //    // DenseCRF.ImgUtil.savefile(listdata[i][0][0], @"D:\testpng\A" + i + ".png");
+
+            //    dynamic data = null;
+            //    if (i > 9)
+            //    {
+            //        data = conv2D.Forward(lostdata);
+            //    }
+            //    else
+            //    {
+            //        data = conv2D.Forward(listdata[i]);
+
+            //    }
+            //    data = sl.Forward(data);
+
+            //    dynamic hh2 = clstmc.Forward(data, h2, c2);
+            //    h2 = hh2.Item1;
+            //    c2 = hh2.Item2;
+            //    listh.Add(h2);
+            //    listc.Add(c2);
+            //    lostdata = h2;
+
+            //}
+            for (int i = 0; i < 20; i++)
             {
-                for (int i = 0; i < len; i++)
+                // DenseCRF.ImgUtil.savefile(listdata[i][0][0], @"D:\testpng\A" + i + ".png");
+                var data = conv2D.Forward(listdata[i]);
+                data = sl.Forward(data);
+
+                // dynamic hh2 = clstmc.Forward(data, listh[i], listc[i]);
+                dynamic hh2 = clstmc.Forward(data, h2, c2);
+                h2 = hh2.Item1;
+                c2 = hh2.Item2;
+                //var data2=conv2D2.Forward(h2);
+                //data2 = sl2.Forward(data2);
+                //var hh = clstmc5.Forward(data2, h, c);
+                //h = hh.Item1;
+                //c = hh.Item2;
+                //   loss += mloss.Forward(h2, listdatay[i]);
+                lostdata = hh2.Item1;
+                if (i >= 9)
                 {
-                    // DenseCRF.ImgUtil.savefile(listdata[i][0][0], @"D:\testpng\A" + i + ".png");
-                    var data = conv2D.Forward(listdata[i]);
-                    data = sl.Forward(data);
-
-                    dynamic hh2 = clstmc.Forward(data, h2, c2);
-                    h2 = hh2.Item1;
-                    c2 = hh2.Item2;
-                    //var data2=conv2D2.Forward(h2);
-                    //data2 = sl2.Forward(data2);
-                    //var hh = clstmc5.Forward(data2, h, c);
-                    //h = hh.Item1;
-                    //c = hh.Item2;
-                    //   loss += mloss.Forward(h2, listdatay[i]);
-                    lostdata = h2;
-                   
-
+                    //  listdata.RemoveAt(0);
+                    DenseCRF.ImgUtil.savefile(lostdata[0][0], @"D:\testpng\Ba" + lh++ + ".png");
+                    listdata.Add(lostdata);
                 }
-                DenseCRF.ImgUtil.savefile(lostdata[0][0], @"D:\testpng\B" + lh + ".png");
-                listdata.RemoveAt(0);
-                listdata.Add(lostdata);
-                lh++;
+
             }
+                
+              
+             
+            
            
 
         }

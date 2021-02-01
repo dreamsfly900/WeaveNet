@@ -15,7 +15,7 @@ namespace FCN
    public   class Matrix
     {
        public float[,] values = new float[0, 0];
-        internal static float[] ReLu(float[] input)
+        internal static float[] ReLu(float[] input, float Alpha)
         {
 
             float[] temp = new float[input.GetLength(0)];
@@ -23,12 +23,12 @@ namespace FCN
             {
 
 
-                temp[x] = ReLu(input[x]);
+                temp[x] = ReLu(input[x], Alpha);
 
             }
             return temp;
         }
-        internal static float[][] ReLu(float[][] input)
+        internal static float[][] ReLu(float[][] input, float Alpha)
         {
 
             float[][] temp = new float[input.GetLength(0)][];
@@ -37,13 +37,80 @@ namespace FCN
                 temp[x] = new float[input[x].GetLength(0)];
                 for (var y = 0; y < input[x].GetLength(0); y++)
                 {
-                    temp[x][y] = ReLu(input[x][y]);
+                    temp[x][y] = ReLu(input[x][y], Alpha);
                 }
 
             }
             return temp;
         }
-       
+        internal static dynamic init2Ddata(dynamic data,int value)
+        {
+            float[][][,] gg;
+            if (data is float[][][,])
+            {
+                for (int i = 0; i < data.Length; i++)
+                {
+                   
+                    for (int j = 0; j < data[i].Length; j++)
+                    {
+                        for (int a = 0; a < data[i][j].GetLength(0); a++)
+                        {
+
+                            for (int s = 0; s < data[i][j].GetLength(1); s++)
+                            {
+                                data[i][j][a, s] = value;
+                            }
+                        }
+                    }
+                }
+            }
+            return data;
+        }
+        internal static dynamic zroe2D(params int[] length)
+        {
+            dynamic data = null;
+            if (length.Length == 1)
+                data = new float[length[0]];
+            if (length.Length == 2)
+            {
+                data = new float[length[0]][];
+                int len = length[0];
+                for (int i = 0; i < len; i++)
+                {
+                    data[i] = new float[length[1]];
+                }
+            }
+            if (length.Length == 3)
+            {
+                data = new float[length[0]][,];
+                int len = length[0];
+                for (int i = 0; i < len; i++)
+                {
+                    data[i] = new float[length[1], length[2]];
+                    //for (int j = 0; j < length[1]; j++)
+                    //{
+                    //    data[i][j] = new float[length[2]];
+                    //}
+                }
+
+            }
+            if (length.Length == 4)
+            {
+                data = new float[length[0]][][,];
+                int len = length[0];
+                for (int i = 0; i < len; i++)
+                {
+                    data[i] = new float[length[1]][,];
+                    for (int j = 0; j < length[1]; j++)
+                    {
+                        data[i][j] = new float[length[2], length[3]];
+                        
+                    }
+                }
+
+            }
+            return data;
+        }
         internal static dynamic zroe(params int[] length)
         {
             dynamic data=null;
@@ -227,7 +294,7 @@ namespace FCN
             }
             return max;
         }
-        internal static float[,] ReLu(float[,] Ma)
+        internal static float[,] ReLu( float[,] Ma, float Alpha)
         {
             int m = Ma.GetLength(0);
             int n = Ma.GetLength(1);
@@ -240,12 +307,20 @@ namespace FCN
 
             for (int i = 0; i < m; i++)
                 for (int j = 0; j < n; j++)
-                    c[i, j] = ReLu(a[i, j] );
+                    c[i, j] = ReLu(a[i, j] , Alpha);
             return c;
         }
-       static float ReLu(float x)
-        { return (float)(Math.Abs(x) + x) / 2.0f; }
-        internal static float[][][,] ReLu(float[][][,] input)
+       static float ReLu(float x, float Alpha)
+        {
+            var keepElements = 0.0f;
+            if (x >= 0)
+                keepElements = x;
+            return x * keepElements + (Alpha * x * (1 - keepElements)); 
+
+         //   return (float)(Math.Abs(x) + x) / 2.0f; 
+        
+        }
+        internal static float[][][,] ReLu(float[][][,] input, float Alpha)
         {
             // x = (np.abs(x) + x) / 2.0
             float[][][,] temp = new float[input.GetLength(0)][][,];
@@ -256,19 +331,22 @@ namespace FCN
                 {
                     if (temp[x][y] == null)
                         temp[x][y] = new float[input[x][y].GetLength(0), input[x][y].GetLength(1)];
-                    temp[x][y] = ReLu(input[x][y]);
+                    temp[x][y] = ReLu(input[x][y], Alpha);
                 }
             }
             return temp;
         }
-        static float ReLubackward(float x,float F)
+        static float ReLubackward(float x,float dot,float Alpha)
         {
-            if (x <= 0)
-                return F*x;
-            else
-                return 1.0f;
+            float keepElements = 0.0f;
+            if (x >= 0)
+             keepElements = x;
+
+
+            return dot * (keepElements + (Alpha * (1 - keepElements)));
+
         }
-        internal static float[] ReLubackward(float[] input, float F)
+        internal static float[] ReLubackward(float[] Dx, float[] input, float F)
         {
 
             float[] temp = new float[input.GetLength(0)];
@@ -276,12 +354,12 @@ namespace FCN
             {
 
 
-                temp[x] = ReLubackward(input[x],F);
+                temp[x] = ReLubackward(Dx[x],input[x],F);
 
             }
             return temp;
         }
-        internal static float[][] ReLubackward(float[][] input, float F)
+        internal static float[][] ReLubackward(float[][] Dx, float[][] input, float F)
         {
 
             float[][] temp = new float[input.GetLength(0)][];
@@ -290,13 +368,13 @@ namespace FCN
                 temp[x] = new float[input[x].GetLength(0)];
                 for (var y = 0; y < input[x].GetLength(0); y++)
                 {
-                    temp[x][y] = ReLubackward(input[x][y],F);
+                    temp[x][y] = ReLubackward(Dx[x][y],input[x][y],F);
                 }
 
             }
             return temp;
         }
-        internal static float[,] ReLubackward(float[,] Ma, float F)
+        internal static float[,] ReLubackward(float[,] Dx, float[,] Ma, float F)
         {
             int m = Ma.GetLength(0);
             int n = Ma.GetLength(1);
@@ -309,10 +387,10 @@ namespace FCN
 
             for (int i = 0; i < m; i++)
                 for (int j = 0; j < n; j++)
-                    c[i, j] = ReLubackward(a[i, j],F);
+                    c[i, j] = ReLubackward(Dx[i,j],a[i, j],F);
             return c;
         }
-        internal static float[][][,] ReLubackward(float[][][,] input, float F)
+        internal static float[][][,] ReLubackward(float[][][,] Dx, float[][][,] input, float F)
         {
             float[][][,] temp = new float[input.GetLength(0)][][,];
             for (var x = 0; x < input.GetLength(0); x++)
@@ -322,7 +400,7 @@ namespace FCN
                 {
                     if (temp[x][y] == null)
                         temp[x][y] = new float[input[x][y].GetLength(0), input[x][y].GetLength(1)];
-                    temp[x][y] = ReLubackward(input[x][y],F);
+                    temp[x][y] = ReLubackward(Dx[x][y],input[x][y],F);
                 }
             }
             return temp;

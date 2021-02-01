@@ -65,13 +65,21 @@ if __name__ == '__main__':
    #np.random.seed(args.seed)
    torch.manual_seed(0)
     
-   input2=torch.ones(1,1,5,5) 
-   outputa=torch.ones(1,1,5,5)
-   
+   input2=torch.ones(1,1,3,3) 
+   outputa=torch.ones(1,1,3,3)
+   m2=nn.Conv2d(1,1,1,1,0)
    #m=nn.ConvTranspose2d(1,1,3,2,1)
-   m2=nn.Conv2d(1,1,2,1,0)
-    
-   output=m2(input)
+   for p in m2.parameters():
+        print(p.data)
+   meslost=nn.MSELoss()
+   loss=0;
+   for i in range(2): 
+     output=m2(input2) 
+     loss+=meslost(output,outputa)
+   loss.backward();
+   
+   #for p in m2.parameters():
+   #     print(p.data)
    #output=m(input)
   
   
@@ -95,8 +103,8 @@ if __name__ == '__main__':
    #print(m2.weight.grad)
    #print(m2.bias.grad)
 
-   print(m.weight.grad)
-   print(m.bias.grad)
+   print(m2.weight.grad)
+   print(m2.bias.grad)
    print(input.grad)
    print(input3.grad)
 

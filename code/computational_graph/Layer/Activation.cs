@@ -12,28 +12,33 @@ namespace computational_graph.Layer
     public class LeakyReLU : Layer
     {
         public float f = 0.1f;
+        public dynamic Dx;
         public dynamic Backward(dynamic dout)
         {
-            return Matrix.ReLu(dout);
+            return Matrix.ReLubackward(Dx,dout, f);
         }
 
         public dynamic Forward(dynamic x )
         {
-            return Matrix.ReLubackward(x, f);
+            Dx = x;
+            return Matrix.ReLu(x, f);
         }
 
         
     }
     public class ReLuLayer : Layer
     {
+        public dynamic Dx;
         public dynamic Backward(dynamic dout)
         {
-            return Matrix.ReLu(dout);
+            return Matrix.ReLubackward(Dx,dout, 0);
         }
 
         public dynamic Forward(dynamic x)
         {
-            return Matrix.ReLubackward(x,0);
+            Dx = x;
+            return Matrix.ReLu(x,0);
+           
         }
     }
     public class TanhLayer : Layer
