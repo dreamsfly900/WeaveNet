@@ -75,7 +75,8 @@ if __name__ == '__main__':
    loss=0;
    for i in range(2): 
      output=m2(input2) 
-     loss+=meslost(output,outputa)
+     output2=torch.nn.LeakyReLU(output)
+     loss+=meslost(output2,outputa)
    loss.backward();
    
    #for p in m2.parameters():

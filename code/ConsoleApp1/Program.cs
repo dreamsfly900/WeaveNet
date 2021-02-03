@@ -10,6 +10,11 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-        }
+#if LINUX
+      
+#else
+       
+#endif
     }
+}
 }

@@ -87,14 +87,16 @@ namespace computational_graph.example.PredRNN
 
              List<float[][][,]> cc_is = Matrix.chunk(combined_h_c, 3, 1);
             var cc_i = cc_is[0];var cc_f = cc_is[1];var cc_g = cc_is[2];
-           
+
+            var ii = sli.Forward(cc_i);
+            var f = slf.Forward(cc_f);
+            var g = slg.Forward(cc_g);
+
             var combined_m = Matrix.cat(input_tensor, h_cur_m, 1);
             // combined_m = torch.cat([input_tensor, h_cur_m], dim = 1)
             combined_m =conv_m.Forward(combined_m);
             List<float[][][,]> cc_i_m = Matrix.chunk(combined_m, 3, 1);
-            var ii = sli.Forward(cc_i);
-            var f = slf.Forward(cc_f);
-            var g = slg.Forward(cc_g);
+          
             var c_next = Matrix.MatrixAdd(mulf_1.Forward(f, c_cur), mulig_1.Forward(ii, g));
 
             var i_m = sli_m.Forward(cc_i_m[0]);

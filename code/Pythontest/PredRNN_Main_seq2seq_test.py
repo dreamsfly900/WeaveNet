@@ -10,8 +10,8 @@ from torch.utils.data import Dataset, DataLoader
 import os
 import time
 
-input=torch.rand(1,10,1,100,100)   # Batch_size , time_step, channels, hight/width, width/hight
-target=torch.rand(1,10,1,100,100)   # Batch_size , time_step, channels, hight/width, width/hight
+input=torch.rand(1,1,1,100,100)   # Batch_size , time_step, channels, hight/width, width/hight
+target=torch.rand(1,1,1,100,100)   # Batch_size , time_step, channels, hight/width, width/hight
 
 class PredRNN_enc(nn.Module):
     def __init__(self):

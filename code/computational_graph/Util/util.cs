@@ -2,6 +2,7 @@
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace DenseCRF
@@ -428,7 +429,7 @@ namespace DenseCRF
                 {
                     weights[a, b] = new Matrix(x, y);
                     weights[a, b].randinit();
-                       System.Threading.Thread.Sleep(10);
+                       System.Threading.Thread.Sleep(1);
                     //缺少随机填充初始化
                 }
 
@@ -436,19 +437,29 @@ namespace DenseCRF
             return weights;
 
         }
+        [DllImport("winmm.dll", EntryPoint = "timeBeginPeriod")]
+        public static extern uint MM_BeginPeriod(uint uMilliseconds);
+        [DllImport("winmm.dll", EntryPoint = "timeEndPeriod")]
+        public static extern uint MM_EndPeriod(uint uMilliseconds);
         public static float[][][,] initweight(int x, int y, int z, int num)
         {
-            
+#if LINUX
+      
+#else
+            MM_BeginPeriod(1);//设置休眠精度
+#endif
+
             float[][][,] weights = new float[z][][,];
             for (var a = 0; a < z; a++)
             {
-                System.Threading.Thread.Sleep(1);
+               // System.Threading.Thread.Sleep(1);
                 weights[a] = new float[num][,];
                 for (var b = 0; b < num; b++)
                 {
                     weights[a][b] = new float[x, y];
                     weights[a][b]=Matrix. randinit(weights[a][b], z+ num);
                     System.Threading.Thread.Sleep(1);
+                    System.Threading.Thread.Yield();
                     //缺少随机填充初始化
                 }
 

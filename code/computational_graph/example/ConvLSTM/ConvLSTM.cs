@@ -16,8 +16,8 @@ namespace computational_graph.example.ConvLSTM
   
         static void Main(string[] args)
         {
-           ///train();
-            ceshi();
+           train();
+          //  ceshi();
            //var ww=Gates.backweight(gird);
 
         }

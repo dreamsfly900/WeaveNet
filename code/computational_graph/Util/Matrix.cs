@@ -313,8 +313,8 @@ namespace FCN
        static float ReLu(float x, float Alpha)
         {
             var keepElements = 0.0f;
-            if (x >= 0)
-                keepElements = x;
+         //   if (x >= 0)
+                keepElements =(float)Convert.ToDouble(x >= 0);
             return x * keepElements + (Alpha * x * (1 - keepElements)); 
 
          //   return (float)(Math.Abs(x) + x) / 2.0f; 
@@ -339,9 +339,9 @@ namespace FCN
         static float ReLubackward(float x,float dot,float Alpha)
         {
             float keepElements = 0.0f;
-            if (x >= 0)
-             keepElements = x;
-
+            //if (x >= 0)
+            // keepElements = x;
+            keepElements = (float)Convert.ToDouble(x >= 0);
 
             return dot * (keepElements + (Alpha * (1 - keepElements)));
 
@@ -2057,7 +2057,7 @@ namespace FCN
             for (var i = 0; i < x; i++)
                 for (var j = 0; j < y; j++)
                 {
-                    //System.Threading.Thread.Sleep(1);
+                   System.Threading.Thread.Yield();
                     float randnum = (((float)rand.Next() / (float)Int32.MaxValue) - 0.5f) * 2; // 产生一个-1到1的随机数
                     bvalue[i, j] = randnum * (float)Math.Sqrt(6.0f / (float)(num));
                     //bvalue[i, j] = ((float)rand.Next() / Int32.MaxValue) * 0.1f;
