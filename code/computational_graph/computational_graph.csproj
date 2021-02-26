@@ -14,10 +14,10 @@
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>true</Optimize>
+    <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -35,15 +35,21 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>computational_graph.example.PredRNN.PredRNNtest</StartupObject>
+    <StartupObject>computational_graph.example.GPUtest</StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ManagedCuda, Version=10.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ManagedCuda.10.0.0\lib\netstandard2.0\ManagedCuda.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Common, Version=4.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Drawing.Common.4.5.1\lib\net461\System.Drawing.Common.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -56,12 +62,14 @@
     <Compile Include="example\ConvLSTM\ConvLSTM.cs" />
     <Compile Include="example\ConvLSTM\ConvLSTMCell.cs" />
     <Compile Include="example\FCN.cs" />
+    <Compile Include="example\GPUtest.cs" />
     <Compile Include="example\GRU.cs" />
     <Compile Include="example\LSTM.-RNN.cs" />
     <Compile Include="example\CNN.cs" />
     <Compile Include="example\PredRNN\PredRNN.cs" />
     <Compile Include="example\PredRNN\PredRNN_Cell.cs" />
     <Compile Include="example\交叉损失函数测试.cs" />
+    <Compile Include="Layer\Class1.cs" />
     <Compile Include="Layer\ConvTranspose2DLayer.cs" />
     <Compile Include="Layer\Dropout.cs" />
     <Compile Include="Layer\Layer.cs" />
@@ -101,6 +109,7 @@
     <Content Include="PRSA_data.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <EmbeddedResource Include="Util\conv2d.ptx" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

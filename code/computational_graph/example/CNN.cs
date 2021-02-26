@@ -22,7 +22,7 @@ namespace computational_graph.example
             List<float[][]> taglist = new List<float[][]>();
             float[][][,] annolisttest = new float[1][][,]; 
             float[][] output = new float[1][];
-
+            Matrix.CUDA = true;
             int sss = 0;
             for (int a = 0; a < 30000; a++)
             {
@@ -38,6 +38,7 @@ namespace computational_graph.example
             }
           //  MSELoss mSELoss = new MSELoss();
             cross_entropy mSELoss = new cross_entropy();
+         
             CNN cNN = new CNN();
             int count = 0;
             while (count < 1)

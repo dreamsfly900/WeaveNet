@@ -37,6 +37,7 @@ namespace computational_graph.example.PredRNN
 
 
         }
+      
         SigmodLayer sli = new SigmodLayer();
         SigmodLayer slf = new SigmodLayer();
         TanhLayer slg = new TanhLayer();
@@ -198,6 +199,31 @@ namespace computational_graph.example.PredRNN
             return b_next;
         }
 
+        internal void load(object[] v1)
+        {
+            conv_h_c.weights = Newtonsoft.Json.JsonConvert.DeserializeObject<float[][][,]>(v1[0].ToString());
+            conv_h_c.basicData = Newtonsoft.Json.JsonConvert.DeserializeObject<float[]>(v1[1].ToString());
+            conv_m.weights = Newtonsoft.Json.JsonConvert.DeserializeObject<float[][][,]>(v1[2].ToString());
+            conv_m.basicData = Newtonsoft.Json.JsonConvert.DeserializeObject<float[]>(v1[3].ToString());
+            conv_o.weights = Newtonsoft.Json.JsonConvert.DeserializeObject<float[][][,]>(v1[4].ToString());
+            conv_o.basicData = Newtonsoft.Json.JsonConvert.DeserializeObject<float[]>(v1[5].ToString());
+            conv_h_next.weights = Newtonsoft.Json.JsonConvert.DeserializeObject<float[][][,]>(v1[6].ToString());
+            conv_h_next.basicData = Newtonsoft.Json.JsonConvert.DeserializeObject<float[]>(v1[7].ToString());
+        }
+        public object[] getWB()
+        {
+            object[] obj = new object[8];
+            obj[0] = conv_h_c.weights;
+            obj[1] = conv_h_c.basicData;
+            obj[2] = conv_m.weights;
+            obj[3] = conv_m.basicData;
+            obj[4] = conv_o.weights;
+            obj[5] = conv_o.basicData;
+            obj[6] = conv_h_next.weights;
+            obj[7] = conv_h_next.basicData;
+
+            return obj;
+        }
         public void update(float lr)
         {
             conv_h_c.update(lr);

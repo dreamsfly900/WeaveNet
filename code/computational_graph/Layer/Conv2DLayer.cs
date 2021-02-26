@@ -1,5 +1,7 @@
-﻿using DenseCRF;
+﻿using ConsoleApp1;
+using DenseCRF;
 using FCN;
+using ManagedCuda;
 using System;
 using System.Collections.Generic;
 using System.Linq;  
@@ -9,6 +11,7 @@ using System.Threading.Tasks;
 namespace computational_graph.Layer
 {
     public enum Activfunction { Null, Sigmod, Tanh, ReLU }
+   
    public class Conv2DLayer
     {
         public int inChannels;   //输入图像的数目
@@ -276,32 +279,44 @@ namespace computational_graph.Layer
                 float[][][,] inputData = grid;
 
                 dynamic outputDataall = null;
-                Parallel.For(0, inputData.Length, cc =>
-                //  for (var cc = 0; cc < inputData.Length; cc++)
+                //Parallel.For(0, inputData.Length, cc =>
+                 for (var cc = 0; cc < inputData.Length; cc++)
                 {
                     float[][][,] outputData = new float[outChannels][][,];
-                    for (i = 0; i < (outChannels); i++)
+                   // if (!Matrix.CUDA)
                     {
-                        outputData[i] = new float[inChannels][,];
-                        for (j = 0; j < (inChannels); j++)
+                        //outputData = new float[outChannels][][,];
+                        for (i = 0; i < (outChannels); i++)
                         {
-                            float[,] v1 = null;
+                            outputData[i] = new float[inChannels][,];
+                            for (j = 0; j < (inChannels); j++)
+                            {
+                                float[,] v1 = null;
 
-                            //  float[,] tt=  Matrix.rot180(grid[cc][i]);
-                            v1 = Matrix.convolution(inputDatamatrices[cc][j], grid[cc][i], stride, padding);
-                            if (outputData[i][j] != null)
-                                outputData[i][j] = Matrix.MatrixAdd(outputData[i][j], v1).values;
-                            else
-                                outputData[i][j] = v1;
+                                //  float[,] tt=  Matrix.rot180(grid[cc][i]);
+                                v1 = Matrix.convnValid(inputDatamatrices[cc][j], grid[cc][i], stride, padding);
+                                // v1 = Matrix.convolution(inputDatamatrices[cc][j], grid[cc][i], stride, padding);
+                                if (outputData[i][j] != null)
+                                    outputData[i][j] = Matrix.MatrixAdd(outputData[i][j], v1).values;
+                                else
+                                    outputData[i][j] = v1;
 
 
-                            // Matrix.MatrixAdd(outputData[i][j], basicData[i]);
+                                // Matrix.MatrixAdd(outputData[i][j], basicData[i]);
+
+                            }
 
                         }
 
-                    }
 
-                    // outputData = Matrix.divide(outputData, outChannels);
+
+                        // outputData = Matrix.divide(outputData, outChannels);
+
+                    }
+                    //else {
+                    
+                    
+                    //}
                     if (outputDataall == null)
                         outputDataall = outputData;
                     else
@@ -309,9 +324,8 @@ namespace computational_graph.Layer
                         outputDataall = Matrix.MatrixAdd(outputDataall, outputData);
                     }
 
-
                 }
-                 );
+              //   );
                // outputDataall = Matrix.divide(outputDataall, inputData.Length* outChannels);
                 float[] outputB = new float[outChannels];
                 if (basic)
@@ -360,8 +374,8 @@ namespace computational_graph.Layer
                 float[][][,] outputData = new float[inputData.Length][][,];
                 dynamic outputDataall = null;
 
-                // for (var cc = 0; cc < inputData.Length; cc++)
-                Parallel.For(0, inputData.Length, cc =>
+                for (var cc = 0; cc < inputData.Length; cc++)
+              //  Parallel.For(0, inputData.Length, cc =>
                 {
                     outputData[cc] = new float[inChannels][,];
                     for (i = 0; i < (inChannels); i++)
@@ -401,7 +415,8 @@ namespace computational_graph.Layer
                     }
 
 
-                });
+                }
+                //);
                 if(inputData.Length>1)
                 outputDataall = Matrix.divide(outputDataall, inputData.Length);
                
@@ -419,34 +434,111 @@ namespace computational_graph.Layer
             //    ActaLayers = new SigmodLayer();
 
             //}
-               //for (var cc = 0; cc < inputData.Length; cc++)
-            Parallel.For(0, inputData.Length, cc =>
+             for (var cc = 0; cc < inputData.Length; cc++)
+            // Parallel.For(0, inputData.Length, cc =>
             {
-                outputData[cc] = new float[outChannels][,];
-
-                for (i = 0; i < (outChannels); i++)
+             
+                if (!Matrix.CUDA)
                 {
+                    outputData[cc] = new float[outChannels][,];
 
-                    float[,] v1 = null;
-                    for (int j = 0; j < (inChannels); j++)
-                    // Parallel.For(0, inChannels, j =>
+                    for (i = 0; i < (outChannels); i++)
                     {
 
-                        float[,] temp;
-                        temp = Matrix.convolution(inputData[cc][j], weights[i][j], stride, padding);
-                        if (v1 == null)
-                            v1 = new float[temp.GetLength(0), temp.GetLength(1)];
-                        v1 = Matrix.MatrixAdd(v1, temp).values;
-                        //temp = inputData[j].convolution(C1.weights[j, i].values, C1.stride, C1.padding);//向前传播 
-                        outputData[cc][i] = v1;
-                        // });
+                        float[,] v1 = null;
+                        for (int j = 0; j < (inChannels); j++)
+                        // Parallel.For(0, inChannels, j =>
+                        {
+
+                            float[,] temp;
+
+                            temp = Matrix.convnValid(inputData[cc][j], weights[i][j], stride, padding);
+                            // temp = Matrix.convolution(inputData[cc][j], weights[i][j], stride, padding);
+                            if (v1 == null)
+                                v1 = new float[temp.GetLength(0), temp.GetLength(1)];
+                            v1 = Matrix.MatrixAdd(v1, temp).values;
+                            //temp = inputData[j].convolution(C1.weights[j, i].values, C1.stride, C1.padding);//向前传播 
+                            outputData[cc][i] = v1;
+                            // });
+                        }
+                        //  outputData[cc][i] = Matrix.MatrixAdd(v1, basicData[i]).values;
+
                     }
-                    //  outputData[cc][i] = Matrix.MatrixAdd(v1, basicData[i]).values;
+                }
+                else {
+                   
+                        float[] h_A = Matrix.float3DTofloat1D(inputData[cc]);
+                        CudaDeviceVariable<float> d_A = h_A;
+                        float[] h_B = Matrix.float4DTofloat1D(weights);
+                        CudaDeviceVariable<float> d_B = h_B;
+
+
+                     
+                        int k = weights[0][0].GetLength(0);
+
+                        int w = inputData[cc][0].GetLength(0);
+                        int h = inputData[cc][0].GetLength(1);
+                        var row = ((w - k) + 2 * padding) / stride + 1;
+                        var col = ((h - k) + 2 * padding) / stride + 1;
+                    CudaDeviceVariable<float> d_C = new float[((outChannels* inChannels) * row * col) ];
+                    //CudaDeviceVariable<float> d_C = new float[((outChannels  ) * row * col)];
+                    //  CudaDeviceVariable<float> d_CD = new float[((outChannels ) * row * col)];
+                    //   CudaDeviceVariable<float> d_C = new float[3194880];
+
+                    //Ho=(H−F+2×P)/S+1
+
+                    int O_TILE_WIDTH = 16;
+
+                      if (outChannels < O_TILE_WIDTH && inChannels < O_TILE_WIDTH)
+                        O_TILE_WIDTH = Math.Max(outChannels, inChannels);
+
+                        int BLOCK_WIDTH = O_TILE_WIDTH ;
+
+
+                    Matrix.CUDA3dConvKernel.BlockDimensions = new ManagedCuda.VectorTypes.dim3(BLOCK_WIDTH, BLOCK_WIDTH);
+
+                    Matrix.CUDA3dConvKernel.GridDimensions = new ManagedCuda.VectorTypes.dim3((outChannels - 1) / O_TILE_WIDTH + 1, (  inChannels - 1) / O_TILE_WIDTH + 1);
+                 //   Matrix.CUDA3dConvKernel.GridDimensions = new ManagedCuda.VectorTypes.dim3(5,1);
+                    Matrix.CUDA3dConvKernel.SetConstantVariable("O_TILE_WIDTH", O_TILE_WIDTH);
+                    DateTime stat = DateTime.Now;
+                    //   Matrix.CUDA3dConvKernel.DynamicSharedMemory = (uint)((outChannels * inChannels) * row * col);
+                    //  Matrix.CUDA3dConvKernel.MaxDynamicSharedSizeBytes = (int)Matrix.CUDA3dConvKernel.DynamicSharedMemory;
+                    //Class1.convolution_3D_shared(h_A, h_B, new float[(outChannels * inChannels) * row * col], k, w, h, row, col, stride, padding, outChannels, inChannels);
+                    Matrix.CUDA3dConvKernel.Run(d_A.DevicePointer, d_B.DevicePointer, d_C.DevicePointer,
+                        k, w, h, row, col, stride, padding, outChannels, inChannels);
+                    DateTime end = DateTime.Now;
+                   // Console.WriteLine($"CUDA计算时间：{(end - stat).TotalMilliseconds}");
+                    float[] gg = d_C;
+                    d_A.Dispose();
+                    d_B.Dispose();
+                    d_C.Dispose();
+                    //Parallel.For(0, inputData.Length, inlen =>
+                    float[][,]  temp= new float[outChannels][,];
+                    for (int inlen = 0; inlen < (outChannels); inlen++)
+                    {
+                        int len = (row * col) * outChannels;
+                        int index = inlen * (row * col) * outChannels;
+                        temp[inlen] = new float[row,col];
+                        for (int olen = 0; olen < (inChannels); olen++)
+                        {
+                            for (int s = 0; s < (row * col); s++)
+                            {
+                                int r = s / row;
+                                int c = (s) % row;
+
+                                temp[inlen][ r,c] += gg[(inlen * inChannels*row * col) +(olen*row*col) +(r * row) + c];
+                            }
+
+                        }
+
+                        
+                    }
+                    outputData[cc] = temp;
 
                 }
 
             }
-            );
+           // );
             //if (Activfunction != Activfunction.Null)
             //    outputData = ActaLayers.Forward(outputData);
             if (basic)

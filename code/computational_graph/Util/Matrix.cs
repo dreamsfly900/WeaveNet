@@ -1,6 +1,9 @@
-﻿using System;
+﻿using ManagedCuda;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +17,32 @@ namespace FCN
     }
    public   class Matrix
     {
+     
+        public  static CudaContext ctx;
+        public static Stream stream;
+        public static CudaKernel CUDAConvKernel;
+        public static CudaKernel CUDA3dConvKernel;
+        public static bool cuda=false;
+        public  static int O_TILE_WIDTH = 16;
+        public static bool CUDA {
+            set
+            { 
+                if (value)
+                {
+                    if (stream == null)
+                    {
+                        ctx = new CudaContext(CudaContext.GetMaxGflopsDeviceId());
+                        string[] liste = Assembly.GetExecutingAssembly().GetManifestResourceNames();
+                        stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(liste[0]);
+                        CUDAConvKernel = ctx.LoadKernelPTX(stream, "convolution_2D_shared");
+                        CUDA3dConvKernel = Matrix.ctx.LoadKernelPTX(Matrix.stream, "convolution_3D_shared");
+                    }
+                  
+                }
+                cuda = value;
+            }
+            get { return cuda; }
+        }
        public float[,] values = new float[0, 0];
         internal static float[] ReLu(float[] input, float Alpha)
         {
@@ -28,6 +57,54 @@ namespace FCN
             }
             return temp;
         }
+        internal static float[] float3DTofloat1D(float[][,] bvalue)
+        {
+            var x = bvalue[0].GetLength(0);
+            var y = bvalue[0].GetLength(1);
+            float[] data = new float[bvalue.GetLength(0)* x * y];
+            for (var c = 0; c < bvalue.Length; c++) {
+                for (var i = 0; i < x; i++)
+                    for (var j = 0; j < y; j++)
+                    {
+                        data[(c*x*y)+(i * x + j)] = bvalue[c][i, j];
+                    }
+            }
+            return data;
+        }
+        internal static float[] float4DTofloat1D(float[][][,] bvalue)
+        {
+            var x = bvalue[0][0].GetLength(0);
+            var y = bvalue[0][0].GetLength(1);
+            float[] data = new float[((bvalue.Length* bvalue[0].Length) * x * y)];
+            int ss = bvalue[0].Length * x * y;
+            for (var c = 0; c < bvalue.Length; c++)
+            {
+                for (var c1 = 0; c1 < bvalue[c].Length; c1++)
+                {
+                    for (var i = 0; i < x; i++)
+                        for (var j = 0; j < y; j++)
+                        {
+                            data[(c *ss)+ (c1 * x * y) + (i * x + j)] = bvalue[c][c1][i, j];
+                        }
+                }
+            }
+            return data;
+        }
+        internal static float[] float2DTofloat1D(float[,] bvalue)
+        {
+
+            var x = bvalue.GetLength(0);
+            var y = bvalue.GetLength(1);
+            float[] data = new float[x * y];
+            
+            for (var i = 0; i < x; i++)
+                for (var j = 0; j < y; j++)
+                {
+                    data[i * x + j]= bvalue[i,j];
+                }
+            return data;
+        }
+
         internal static float[][] ReLu(float[][] input, float Alpha)
         {
 
@@ -64,8 +141,34 @@ namespace FCN
                     }
                 }
             }
+            if (data is float[,])
+            {
+                for (int a = 0; a < data.GetLength(0); a++)
+                {
+
+                    for (int s = 0; s < data.GetLength(1); s++)
+                    {
+                        data[a, s] = value;
+                    }
+                }
+            }
+                return data;
+        }
+
+        internal static float[,] float1DTofloat2D(float[] aa, int w, int h)
+        {
+            int len = aa.Length;
+            float[,] data = new float[w, h];
+
+            for (int i = 0; i < len; i++)
+            {
+                int col = i % h;
+                int row = i / w;
+                data[row, col] = aa[i];
+            }
             return data;
         }
+
         internal static dynamic zroe2D(params int[] length)
         {
             dynamic data = null;
@@ -435,7 +538,7 @@ namespace FCN
             int n = matrix.GetLength(1);
             int km = kernel.GetLength(0);
             int kn = kernel.GetLength(1);
-            float[,] extendMatrix = extend2(matrix, stride, p, km);
+            float[,] extendMatrix = extend(matrix, stride, p, km);
             //float[,] extendMatrix = new float[(m* stride) + (2-p) * (km - 1), (n* stride) + (2-p) * (kn - 1)];
            
             //if (m == extendMatrix.GetLength(0) && n == extendMatrix.GetLength(1))
@@ -489,7 +592,27 @@ namespace FCN
             }
             return data;
         }
-      
+
+        internal static float[][,] float1DTofloat3D(float[] gg,int w,int h,int channl)
+        {
+            float[][,] data = new float[channl][,];
+            
+            for (int c = 0; c < channl; c++)
+            {
+                data[c] = new float[w,h];
+                for (int x = 0; x< w; x++)
+                {
+                    for (int y = 0; y < h; y++)
+                    {
+                        data[c][x, y] = gg[(c*(w*h))+(x*w)+y];
+                    }
+
+                }
+                
+            }
+            return data;
+        }
+
         internal static float[] dot(float[] weights, float[] matrices)
         {
             float[] data = new float[weights.GetLength(0)];
@@ -998,8 +1121,8 @@ namespace FCN
         }
         public static float[,] convnValid(float[,] matrix, float[,] kernel, int stride,int p)
         {
-
-            return Conv(matrix, kernel, stride, p);
+            
+            return convolution(matrix, kernel, stride, p);
             //		kernel = rot180(kernel);
             //int m = matrix.GetLength(0);
             //int n = matrix.GetLength(1);
@@ -1578,6 +1701,20 @@ namespace FCN
 
                     input[x][y] = MatrixAdd(Ma[x][y], Mb[x][y]).values;
                 }
+            }
+            return input;
+        }
+        public static float[][,] MatrixAdd(float[][,] Ma, float[][,] Mb)
+        {
+            float[][,] input = new float[Ma.Length][,];
+            //  Matrix[,] input = new Matrix[Ma.GetLength(0), Ma.GetLength(1)];
+            for (var x = 0; x < input.GetLength(0); x++)
+            {
+                input[x] = new float[Ma[x].GetLength(0), Ma[x].GetLength(1)];
+               
+
+                    input[x] = MatrixAdd(Ma[x], Mb[x]).values;
+                
             }
             return input;
         }
@@ -2456,14 +2593,15 @@ namespace FCN
             }
             return data;
         }
-        static float[,] extend2(float[,] value, int stride, int padding, int ksize)
+        static float[,] extend2(float[,] value, int padding, int ksize)
         {
+            int stride = 1;
             int w = value.GetLength(0);
             int h = value.GetLength(1);
             
-            int paddingn = ksize - padding - 1;
-            w = w + (w ) * (stride - 1) + (paddingn * 2);
-            h = h + (h ) * (stride - 1) + (paddingn * 2);
+             
+            w = w + padding*2;
+            h = h + padding * 2;
             //if (w % 2 == 0 && h % 2 == 0)
             //{
 
@@ -2473,7 +2611,7 @@ namespace FCN
             //}
 
 
-            padding = paddingn;
+        
             //padding = ksize / 2 + ksize % 2 == 0 ? 0 : 1;
             float[,] data = new float[w, h];
             int a = 0, b = 0;
@@ -2525,50 +2663,84 @@ namespace FCN
             }
             return data;
         }
+        
         public static float[,] convolution(float[,] value, float[,] m, int stride, int padding = 0)
         {
+            //if (CUDA)
+            //{
+            //    value = extend2(value, padding, 3);
+            //    int k = m.GetLength(0);
+               
+            //    int w = value.GetLength(0);
+            //    int h = value.GetLength(1);
+             
+            //    var row = ((w - k) + 2 * padding) / stride + 1;
+            //    var col = ((h - k) + 2 * padding) / stride + 1;
+              
+            //    int S = (w - (k - 1)) * (h - (k - 1));
+            //    float[] h_A = Matrix.float2DTofloat1D(value);
+            //    float[] h_B = Matrix.float2DTofloat1D(m); 
+
+            //    CudaDeviceVariable<float> d_A = h_A;
+            //    CudaDeviceVariable<float> d_B = h_B;
+            //    CudaDeviceVariable<float> d_C = new float[row* col];
+              
+            //    int BLOCK_WIDTH = O_TILE_WIDTH + (k - 1)+ padding*2;
+               
+
+            //    CUDAConvKernel.BlockDimensions = new ManagedCuda.VectorTypes.dim3(BLOCK_WIDTH, BLOCK_WIDTH);
+            //    CUDAConvKernel.GridDimensions = new ManagedCuda.VectorTypes.dim3((row - 1) / O_TILE_WIDTH + 1, (col - 1) / O_TILE_WIDTH + 1);
+            //    CUDAConvKernel.SetConstantVariable("O_TILE_WIDTH", O_TILE_WIDTH);
+            //    CUDAConvKernel.Run(d_A.DevicePointer, d_B.DevicePointer, d_C.DevicePointer, k, w, h, row, col, stride, padding);
+            //    float[] h_C = d_C;
+            //    d_A.Dispose();
+            //    d_B.Dispose();
+            //    d_C.Dispose();
+            //    return Matrix.float1DTofloat2D(h_C, row, col);
+            //}
+            //else
             return Conv(value, m, stride, padding);
-            var x = value.GetLength(0);
-            var y = value.GetLength(1);
-            var x2 = m.GetLength(0);
-            var y2 = m.GetLength(1);
-            var p = padding;
-            //Ho=(H−F+2×P)/S+1
-            var row = ((x - x2) + 2 * p) / stride + 1;
-            var col = ((y - y2) + 2 * p) / stride + 1;
-            float[,] temp = new float[row, col];
-            var nx = 0;
-          //  Parallel.For(0 - p, (x - x2 + p)/ stride, cc  =>
-            for (var i = 0 - p; i <= x - x2 + p; i = i + stride)
-            {
-                //  i = i + stride;
-                //  var ny = 0;
-              // int i = cc * stride;
-                if (i >= 0 && i < x)
-                    for (var j = 0 - p; j <= y - y2 + p; j = j + stride)
-                    {
-                        if (j >= 0 && j < y)
-                        {
-                            for (var i2 = 0; i2 < x2; i2++)
-                                for (var j2 = 0; j2 < y2; j2++)
-                                {
-                                    if (i + i2 < 0 || j + j2 < 0 || i + i2 >= x || j + j2 >= y)
-                                    { continue; }
-                                    else
-                                        temp[i, j] += value[i + i2, j + j2] * m[i2, j2];
+            //var x = value.GetLength(0);
+            //var y = value.GetLength(1);
+            //var x2 = m.GetLength(0);
+            //var y2 = m.GetLength(1);
+            //var p = padding;
+            //Ho = (H−F + 2×P)/ S + 1
+            //var row = ((x - x2) + 2 * p) / stride + 1;
+            //var col = ((y - y2) + 2 * p) / stride + 1;
+            //float[,] temp = new float[row, col];
+            //var nx = 0;
+            //Parallel.For(0 - p, (x - x2 + p) / stride, cc =>
+            //for (var i = 0 - p; i <= x - x2 + p; i = i + stride)
+            //{
+            //    i = i + stride;
+            //    var ny = 0;
+            //    int i = cc * stride;
+            //    if (i >= 0 && i < x)
+            //        for (var j = 0 - p; j <= y - y2 + p; j = j + stride)
+            //        {
+            //            if (j >= 0 && j < y)
+            //            {
+            //                for (var i2 = 0; i2 < x2; i2++)
+            //                    for (var j2 = 0; j2 < y2; j2++)
+            //                    {
+            //                        if (i + i2 < 0 || j + j2 < 0 || i + i2 >= x || j + j2 >= y)
+            //                        { continue; }
+            //                        else
+            //                            temp[i, j] += value[i + i2, j + j2] * m[i2, j2];
 
-                                }
-                            temp[i, j] = (float)(temp[i, j]);
-                        }
-                    }
-                // temp[nx, ny] = Math.Max(ReLU, temp[nx, ny] + bias);
-                // ny++;
+            //                    }
+            //                temp[i, j] = (float)(temp[i, j]);
+            //            }
+            //        }
+            //    temp[nx, ny] = Math.Max(ReLU, temp[nx, ny] + bias);
+            //    ny++;
 
-                //  nx++;
-            }
-           // );
+            //    nx++;
+            //}
+            //);
 
-            return temp;
+           // return temp;
         }
          
         public static Matrix[,] Clip(Matrix[,] grads)
