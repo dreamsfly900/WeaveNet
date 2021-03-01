@@ -283,8 +283,9 @@ namespace computational_graph.Layer
                  for (var cc = 0; cc < inputData.Length; cc++)
                 {
                     float[][][,] outputData = new float[outChannels][][,];
-                   // if (!Matrix.CUDA)
+                    // if (!Matrix.CUDA)
                     {
+                        DateTime stat = DateTime.Now;
                         //outputData = new float[outChannels][][,];
                         for (i = 0; i < (outChannels); i++)
                         {
@@ -307,15 +308,18 @@ namespace computational_graph.Layer
                             }
 
                         }
+                        DateTime end = DateTime.Now;
+                        Console.WriteLine($"backconv计算时间：{(end - stat).TotalMilliseconds}");
 
 
 
                         // outputData = Matrix.divide(outputData, outChannels);
 
                     }
-                    //else {
-                    
-                    
+                    //else
+                    //{
+
+
                     //}
                     if (outputDataall == null)
                         outputDataall = outputData;
@@ -423,25 +427,38 @@ namespace computational_graph.Layer
                 return outputDataall;
             }
         }
+        CudaDeviceVariable<float> d_A;
+        CudaDeviceVariable<float> d_B;
+        CudaDeviceVariable<float> d_C;
         float[][][,] conv( float[][][,] inputData)
         {
             float[][][,] outputData = new float[inputData.Length][][,];
             int i;
 
 
+            if (Matrix.CUDA)
+            {
+                int k = weights[0][0].GetLength(0);
+
+                int w = inputData[0][0].GetLength(0);
+                int h = inputData[0][0].GetLength(1);
+                var row = ((w - k) + 2 * padding) / stride + 1;
+                var col = ((h - k) + 2 * padding) / stride + 1;
+                d_C = new float[((outChannels * inChannels) * row * col)];
+            }
             //if (Activfunction == Activfunction.Sigmod)
             //{
             //    ActaLayers = new SigmodLayer();
 
             //}
-             for (var cc = 0; cc < inputData.Length; cc++)
+            for (var cc = 0; cc < inputData.Length; cc++)
             // Parallel.For(0, inputData.Length, cc =>
             {
              
                 if (!Matrix.CUDA)
                 {
                     outputData[cc] = new float[outChannels][,];
-
+                    DateTime stat = DateTime.Now;
                     for (i = 0; i < (outChannels); i++)
                     {
 
@@ -464,61 +481,58 @@ namespace computational_graph.Layer
                         //  outputData[cc][i] = Matrix.MatrixAdd(v1, basicData[i]).values;
 
                     }
+                    DateTime end = DateTime.Now;
+                   // Console.WriteLine($"计算时间：{(end - stat).TotalMilliseconds}");
                 }
-                else {
-                   
-                        float[] h_A = Matrix.float3DTofloat1D(inputData[cc]);
-                        CudaDeviceVariable<float> d_A = h_A;
-                        float[] h_B = Matrix.float4DTofloat1D(weights);
-                        CudaDeviceVariable<float> d_B = h_B;
+                else
+                {
+                    DateTime stat = DateTime.Now;
+                    float[] h_A = Matrix.float3DTofloat1D(inputData[cc]);
+                    d_A = h_A;
+                    float[] h_B = Matrix.float4DTofloat1D(weights);
+                    DateTime end = DateTime.Now;
+                 //   Console.WriteLine($"复制数据计算时间：{(end - stat).TotalMilliseconds}");
+                    d_B = h_B;
+                    int k = weights[0][0].GetLength(0);
 
-
-                     
-                        int k = weights[0][0].GetLength(0);
-
-                        int w = inputData[cc][0].GetLength(0);
-                        int h = inputData[cc][0].GetLength(1);
-                        var row = ((w - k) + 2 * padding) / stride + 1;
-                        var col = ((h - k) + 2 * padding) / stride + 1;
-                    CudaDeviceVariable<float> d_C = new float[((outChannels* inChannels) * row * col) ];
-                    //CudaDeviceVariable<float> d_C = new float[((outChannels  ) * row * col)];
-                    //  CudaDeviceVariable<float> d_CD = new float[((outChannels ) * row * col)];
-                    //   CudaDeviceVariable<float> d_C = new float[3194880];
+                    int w = inputData[cc][0].GetLength(0);
+                    int h = inputData[cc][0].GetLength(1);
+                    var row = ((w - k) + 2 * padding) / stride + 1;
+                    var col = ((h - k) + 2 * padding) / stride + 1;
 
                     //Ho=(H−F+2×P)/S+1
 
                     int O_TILE_WIDTH = 16;
 
-                      if (outChannels < O_TILE_WIDTH && inChannels < O_TILE_WIDTH)
+                    if (outChannels < O_TILE_WIDTH && inChannels < O_TILE_WIDTH)
                         O_TILE_WIDTH = Math.Max(outChannels, inChannels);
 
-                        int BLOCK_WIDTH = O_TILE_WIDTH ;
+                    int BLOCK_WIDTH = O_TILE_WIDTH;
 
 
                     Matrix.CUDA3dConvKernel.BlockDimensions = new ManagedCuda.VectorTypes.dim3(BLOCK_WIDTH, BLOCK_WIDTH);
 
-                    Matrix.CUDA3dConvKernel.GridDimensions = new ManagedCuda.VectorTypes.dim3((outChannels - 1) / O_TILE_WIDTH + 1, (  inChannels - 1) / O_TILE_WIDTH + 1);
-                 //   Matrix.CUDA3dConvKernel.GridDimensions = new ManagedCuda.VectorTypes.dim3(5,1);
+                    Matrix.CUDA3dConvKernel.GridDimensions = new ManagedCuda.VectorTypes.dim3((outChannels - 1) / O_TILE_WIDTH + 1, (inChannels - 1) / O_TILE_WIDTH + 1);
+                    //   Matrix.CUDA3dConvKernel.GridDimensions = new ManagedCuda.VectorTypes.dim3(5,1);
                     Matrix.CUDA3dConvKernel.SetConstantVariable("O_TILE_WIDTH", O_TILE_WIDTH);
-                    DateTime stat = DateTime.Now;
+                    stat = DateTime.Now;
                     //   Matrix.CUDA3dConvKernel.DynamicSharedMemory = (uint)((outChannels * inChannels) * row * col);
                     //  Matrix.CUDA3dConvKernel.MaxDynamicSharedSizeBytes = (int)Matrix.CUDA3dConvKernel.DynamicSharedMemory;
                     //Class1.convolution_3D_shared(h_A, h_B, new float[(outChannels * inChannels) * row * col], k, w, h, row, col, stride, padding, outChannels, inChannels);
                     Matrix.CUDA3dConvKernel.Run(d_A.DevicePointer, d_B.DevicePointer, d_C.DevicePointer,
                         k, w, h, row, col, stride, padding, outChannels, inChannels);
-                    DateTime end = DateTime.Now;
-                   // Console.WriteLine($"CUDA计算时间：{(end - stat).TotalMilliseconds}");
+                    end = DateTime.Now;
+                   // Console.WriteLine($"CUDA计算conv时间：{(end - stat).TotalMilliseconds}");
                     float[] gg = d_C;
-                    d_A.Dispose();
-                    d_B.Dispose();
-                    d_C.Dispose();
-                    //Parallel.For(0, inputData.Length, inlen =>
-                    float[][,]  temp= new float[outChannels][,];
+
+                    float[][,] temp = new float[outChannels][,];
+                    stat = DateTime.Now;
+                    // Parallel.For(0, inputData.Length, inlen =>
                     for (int inlen = 0; inlen < (outChannels); inlen++)
                     {
                         int len = (row * col) * outChannels;
                         int index = inlen * (row * col) * outChannels;
-                        temp[inlen] = new float[row,col];
+                        temp[inlen] = new float[row, col];
                         for (int olen = 0; olen < (inChannels); olen++)
                         {
                             for (int s = 0; s < (row * col); s++)
@@ -526,19 +540,24 @@ namespace computational_graph.Layer
                                 int r = s / row;
                                 int c = (s) % row;
 
-                                temp[inlen][ r,c] += gg[(inlen * inChannels*row * col) +(olen*row*col) +(r * row) + c];
+                                temp[inlen][r, c] += gg[(inlen * inChannels * row * col) + (olen * row * col) + (r * row) + c];
                             }
 
                         }
 
-                        
-                    }
-                    outputData[cc] = temp;
 
+                    }//);
+                    end = DateTime.Now;
+                  //  Console.WriteLine($"CPU换算计算时间：{(end - stat).TotalMilliseconds}");
+                    outputData[cc] = temp;
+                    d_A.Dispose();
+                    d_B.Dispose();
+                    d_C.Dispose();
                 }
 
             }
-           // );
+           
+            // );
             //if (Activfunction != Activfunction.Null)
             //    outputData = ActaLayers.Forward(outputData);
             if (basic)

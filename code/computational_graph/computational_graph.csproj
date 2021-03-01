@@ -35,7 +35,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>computational_graph.example.GPUtest</StartupObject>
+    <StartupObject>computational_graph.example.PredRNN.PredRNNtest</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ManagedCuda, Version=10.0.0.0, Culture=neutral, processorArchitecture=MSIL">

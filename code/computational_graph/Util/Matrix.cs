@@ -57,11 +57,12 @@ namespace FCN
             }
             return temp;
         }
-        internal static float[] float3DTofloat1D(float[][,] bvalue)
+        internal static float[] float3DTofloat1D(float[][,] bvalue, float[] data = null)
         {
             var x = bvalue[0].GetLength(0);
             var y = bvalue[0].GetLength(1);
-            float[] data = new float[bvalue.GetLength(0)* x * y];
+            if(data == null)
+              data = new float[bvalue.GetLength(0)* x * y];
             for (var c = 0; c < bvalue.Length; c++) {
                 for (var i = 0; i < x; i++)
                     for (var j = 0; j < y; j++)
@@ -71,11 +72,12 @@ namespace FCN
             }
             return data;
         }
-        internal static float[] float4DTofloat1D(float[][][,] bvalue)
+        internal static float[] float4DTofloat1D(float[][][,] bvalue, float[] data = null)
         {
             var x = bvalue[0][0].GetLength(0);
             var y = bvalue[0][0].GetLength(1);
-            float[] data = new float[((bvalue.Length* bvalue[0].Length) * x * y)];
+            if (data == null)
+               data = new float[((bvalue.Length* bvalue[0].Length) * x * y)];
             int ss = bvalue[0].Length * x * y;
             for (var c = 0; c < bvalue.Length; c++)
             {
@@ -2666,40 +2668,44 @@ namespace FCN
         
         public static float[,] convolution(float[,] value, float[,] m, int stride, int padding = 0)
         {
-            //if (CUDA)
-            //{
-            //    value = extend2(value, padding, 3);
-            //    int k = m.GetLength(0);
-               
-            //    int w = value.GetLength(0);
-            //    int h = value.GetLength(1);
-             
-            //    var row = ((w - k) + 2 * padding) / stride + 1;
-            //    var col = ((h - k) + 2 * padding) / stride + 1;
-              
-            //    int S = (w - (k - 1)) * (h - (k - 1));
-            //    float[] h_A = Matrix.float2DTofloat1D(value);
-            //    float[] h_B = Matrix.float2DTofloat1D(m); 
+            if (CUDA)
+            {
+                DateTime stat = DateTime.Now;
+                //  value = extend2(value, padding, 3);
+                int k = m.GetLength(0);
 
-            //    CudaDeviceVariable<float> d_A = h_A;
-            //    CudaDeviceVariable<float> d_B = h_B;
-            //    CudaDeviceVariable<float> d_C = new float[row* col];
-              
-            //    int BLOCK_WIDTH = O_TILE_WIDTH + (k - 1)+ padding*2;
-               
+                int w = value.GetLength(0);
+                int h = value.GetLength(1);
 
-            //    CUDAConvKernel.BlockDimensions = new ManagedCuda.VectorTypes.dim3(BLOCK_WIDTH, BLOCK_WIDTH);
-            //    CUDAConvKernel.GridDimensions = new ManagedCuda.VectorTypes.dim3((row - 1) / O_TILE_WIDTH + 1, (col - 1) / O_TILE_WIDTH + 1);
-            //    CUDAConvKernel.SetConstantVariable("O_TILE_WIDTH", O_TILE_WIDTH);
-            //    CUDAConvKernel.Run(d_A.DevicePointer, d_B.DevicePointer, d_C.DevicePointer, k, w, h, row, col, stride, padding);
-            //    float[] h_C = d_C;
-            //    d_A.Dispose();
-            //    d_B.Dispose();
-            //    d_C.Dispose();
-            //    return Matrix.float1DTofloat2D(h_C, row, col);
-            //}
-            //else
-            return Conv(value, m, stride, padding);
+                var row = ((w - k) + 2 * padding) / stride + 1;
+                var col = ((h - k) + 2 * padding) / stride + 1;
+
+                int S = (w - (k - 1)) * (h - (k - 1));
+                float[] h_A = Matrix.float2DTofloat1D(value);
+                float[] h_B = Matrix.float2DTofloat1D(m);
+
+                CudaDeviceVariable<float> d_A = h_A;
+                CudaDeviceVariable<float> d_B = h_B;
+                CudaDeviceVariable<float> d_C = new float[row * col];
+
+                int BLOCK_WIDTH = O_TILE_WIDTH + 1;
+
+
+                CUDAConvKernel.BlockDimensions = new ManagedCuda.VectorTypes.dim3(BLOCK_WIDTH, BLOCK_WIDTH);
+                CUDAConvKernel.GridDimensions = new ManagedCuda.VectorTypes.dim3((w - 1) / O_TILE_WIDTH + 1, (h - 1) / O_TILE_WIDTH + 1);
+                CUDAConvKernel.SetConstantVariable("O_TILE_WIDTH", O_TILE_WIDTH);
+                CUDAConvKernel.Run(d_A.DevicePointer, d_B.DevicePointer, d_C.DevicePointer, k, w, h, row, col, stride, padding);
+                float[] h_C = d_C;
+                d_A.Dispose();
+                d_B.Dispose();
+                d_C.Dispose();
+                DateTime end = DateTime.Now;
+               // Console.WriteLine($"CUDA计算convolution时间：{(end - stat).TotalMilliseconds}");
+                return Matrix.float1DTofloat2D(h_C, row, col);
+
+            }
+            else
+                return Conv(value, m, stride, padding);
             //var x = value.GetLength(0);
             //var y = value.GetLength(1);
             //var x2 = m.GetLength(0);

@@ -53,9 +53,10 @@ namespace computational_graph.example
             //   }
             Conv2DLayer conv2D = new Conv2DLayer(1, 0, 3, 2, 2);
             dynamic bb= conv2D.Forward(aa);
-              
+            dynamic ff2 = conv2D.Backward(bb);
             Matrix.CUDA = false;
             dynamic bb2 = conv2D.Forward(aa);
+            dynamic ff = conv2D.Backward(bb2);
          }
         public bool check(float[] h_C, float[] h_B)
         {
