@@ -1,5 +1,6 @@
 ﻿using computational_graph.Layer;
 using computational_graph.loss;
+using computational_graph.Util;
 using FCN;
 using Newtonsoft.Json;
 using System;
@@ -14,6 +15,19 @@ namespace computational_graph
     {
         static void Main(string[] args)
         {
+            SSIM ssim = new SSIM();
+             Matrix[] anno1 = DenseCRF.util.readpnggetMatrix("einstein.png",false);
+            Matrix[] anno2 = DenseCRF.util.readpnggetMatrix("einstein2.png", false);
+
+            float[] ssa = new float[3];
+            float ss = 0;
+            for (int i = 0; i < 3; i++)
+            {
+                ssa[i] = ssim.ssim(anno1[i].values, anno2[i].values);
+                ss += ssa[i];
+                Console.WriteLine(ssa[i]);
+            }
+            Console.WriteLine(ss/3);
             //double jiaodu= Math.Atan((37-300)/-(10 *10));
             //jiaodu = (180.0 * jiaodu / Math.PI);
             //if (jiaodu < 70) { }
@@ -46,7 +60,7 @@ namespace computational_graph
 
 
 
-            test2D();
+            //   test2D();
             Console.ReadLine();
         }
       

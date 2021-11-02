@@ -35,7 +35,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>computational_graph.example.PredRNN.PredRNNtest</StartupObject>
+    <StartupObject>computational_graph.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ManagedCuda, Version=10.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -88,6 +88,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util\Minst.cs" />
+    <Compile Include="Util\SSIM.cs" />
     <Compile Include="Util\util.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -106,6 +107,12 @@
     <None Include="data\train-labels.idx1-ubyte" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="einstein.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="einstein2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="PRSA_data.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

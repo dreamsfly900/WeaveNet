@@ -92,6 +92,54 @@ namespace FCN
             }
             return data;
         }
+
+        internal static float[][][,] Pow(float[][][,] mu1, int v)
+        {
+            float[][][,] temp = new float[mu1.GetLength(0)][][,];
+            for (var x = 0; x < mu1.GetLength(0); x++)
+            {
+                temp[x] = new float[mu1[x].GetLength(0)][,];
+                for (var y = 0; y < mu1[x].GetLength(0); y++)
+                {
+                    temp[x][y] = Pow(mu1[x][y], v);
+                }
+
+            }
+            return temp;
+        }
+
+        internal static float Mean(float[,] ssim_map)
+        {
+            float sumnum = 0;
+            int m = ssim_map.GetLength(0);
+            int n = ssim_map.GetLength(1);
+            for (var x = 0; x < m; x++)
+            {
+
+                for (var y = 0; y < n; y++)
+                {
+                    sumnum+=ssim_map[x, y] ;
+                }
+
+            }
+            return sumnum / (m * n);
+        }
+
+        internal static float[,] Pow(float[,] v1, int v2)
+        {
+            float[,] mu1 = new float[v1.GetLength(0), v1.GetLength(1)];
+            for (var x = 0; x < v1.GetLength(0); x++)
+            {
+               
+                for (var y = 0; y < v1.GetLength(1); y++)
+                {
+                    mu1[x, y] =(float)Math.Pow((double)v1[x,y], (double)v2);
+                }
+
+            }
+            return mu1;
+        }
+
         internal static float[] float2DTofloat1D(float[,] bvalue)
         {
 
@@ -1823,7 +1871,28 @@ namespace FCN
             //        c[i, j] = a[i, j] + bias;
             return Mc;
         }
+        public unsafe static float[,] MAdd(float[,] Ma, float bias = 0)
+        {
+            int m = Ma.GetLength(0);
+            int n = Ma.GetLength(1);
 
+             
+            float[,] c = new float[m,n];
+
+
+            fixed (float* marr = &Ma[0, 0])
+            {
+
+                for (int i = 0; i < m; i++)
+                    for (int j = 0; j < n; j++)
+                        c[i, j] = *(marr + j + (i * m)) + bias;
+
+            }
+            //for (int i = 0; i < m; i++)
+            //    for (int j = 0; j < n; j++)
+            //        c[i, j] = a[i, j] + bias;
+            return c;
+        }
         public static Matrix activation_ReLU(float[,] Ma, float bias = 0,float relu=0)
         {
             int m = Ma.GetLength(0);
@@ -2111,6 +2180,26 @@ namespace FCN
                     for (int j = 0; j < lie; j++)
                     {
                         result[i, j] = *(arr + j + (i * hang))   / b;
+                    }
+                }
+            }
+            return result;
+        }
+        public unsafe static float[,] divide(float[,] a, float[,] b)
+        {
+            int hang = a.GetLength(0);
+            int lie = a.GetLength(1);
+            float[,] result = new float[hang, lie];
+            fixed (float* arr = &a[0, 0])
+            {
+                fixed (float* arrb = &b[0, 0])
+                {
+                    for (int i = 0; i < hang; i++)
+                    {
+                        for (int j = 0; j < lie; j++)
+                        {
+                            result[i, j] = *(arr + j + (i * hang)) / *(arrb + j + (i * hang));
+                        }
                     }
                 }
             }
