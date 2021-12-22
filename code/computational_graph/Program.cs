@@ -19,6 +19,12 @@ namespace computational_graph
              Matrix[] anno1 = DenseCRF.util.readpnggetMatrix("einstein.png",false);
             Matrix[] anno2 = DenseCRF.util.readpnggetMatrix("einstein2.png", false);
 
+
+            MSELoss mSELoss = new MSELoss();
+            // 1000
+           var hh= mSELoss.Forward(new float[] {2f },new float[]{ 5f});
+            //hh 误差
+
             float[] ssa = new float[3];
             float ss = 0;
             for (int i = 0; i < 3; i++)
