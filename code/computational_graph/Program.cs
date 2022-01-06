@@ -20,11 +20,10 @@ namespace computational_graph
             Matrix[] anno2 = DenseCRF.util.readpnggetMatrix("einstein2.png", false);
 
 
-            MSELoss mSELoss = new MSELoss();
-            // 1000
-           var hh= mSELoss.Forward(new float[] {2f },new float[]{ 5f});
             //hh 误差
-
+            float[] data = new float[] { 1,2,3,4,5 };
+            float[] data2 = new float[] { 1, 2, 6, 4, 5 };
+           var sim=  Sim.sim_pearson(data, data2);
             float[] ssa = new float[3];
             float ss = 0;
             for (int i = 0; i < 3; i++)
@@ -34,6 +33,10 @@ namespace computational_graph
                 Console.WriteLine(ssa[i]);
             }
             Console.WriteLine(ss/3);
+
+            MSELoss mSELoss = new MSELoss();
+            // 1000
+            var hh = mSELoss.Forward(new float[] { 2f }, new float[] { 5f }); 
             //double jiaodu= Math.Atan((37-300)/-(10 *10));
             //jiaodu = (180.0 * jiaodu / Math.PI);
             //if (jiaodu < 70) { }

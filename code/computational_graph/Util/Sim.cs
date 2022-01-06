@@ -14,7 +14,7 @@ namespace computational_graph.Util
         /// <param name="data1"></param>
         /// <param name="data2"></param>
         /// <returns></returns>
-        public float sim_pearson(float[] data1,float[] data2)
+        public static float sim_pearson(float[] data1,float[] data2)
         {
             if (data1.Length != data2.Length)
                 return 0;
