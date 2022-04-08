@@ -1,5 +1,5 @@
 #  WeaveNet
-版权所有:河南知真信息技术有限公司
+版权所有:北京知天智为气象科技有限公司
 #### 介绍
 一个使用C#编写的用于神经网络的计算图框架computational graph。带有 **cnn,bp,fcn,lstm,convlstm,GRU** 等示例。使用方法接进pytorch。
 
