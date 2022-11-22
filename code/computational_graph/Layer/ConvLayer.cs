@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace computational_graph.Layer
 {
-    class ConvLayer
+   public class ConvLayer
     {
         public int inChannels;   //输入图像的数目
         public int outChannels;  //输出图像的数目
