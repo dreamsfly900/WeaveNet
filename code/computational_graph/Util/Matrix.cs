@@ -44,7 +44,7 @@ namespace FCN
             get { return cuda; }
         }
        public float[,] values = new float[0, 0];
-        internal static float[] ReLu(float[] input, float Alpha)
+        public static float[] ReLu(float[] input, float Alpha)
         {
 
             float[] temp = new float[input.GetLength(0)];
@@ -57,7 +57,7 @@ namespace FCN
             }
             return temp;
         }
-        internal static float[] float3DTofloat1D(float[][,] bvalue, float[] data = null)
+        public static float[] float3DTofloat1D(float[][,] bvalue, float[] data = null)
         {
             var x = bvalue[0].GetLength(0);
             var y = bvalue[0].GetLength(1);
@@ -72,7 +72,7 @@ namespace FCN
             }
             return data;
         }
-        internal static float[] float4DTofloat1D(float[][][,] bvalue, float[] data = null)
+        public static float[] float4DTofloat1D(float[][][,] bvalue, float[] data = null)
         {
             var x = bvalue[0][0].GetLength(0);
             var y = bvalue[0][0].GetLength(1);
@@ -93,7 +93,7 @@ namespace FCN
             return data;
         }
 
-        internal static float[][][,] Pow(float[][][,] mu1, int v)
+        public static float[][][,] Pow(float[][][,] mu1, int v)
         {
             float[][][,] temp = new float[mu1.GetLength(0)][][,];
             for (var x = 0; x < mu1.GetLength(0); x++)
@@ -108,7 +108,7 @@ namespace FCN
             return temp;
         }
 
-        internal static float Mean(float[,] ssim_map)
+        public static float Mean(float[,] ssim_map)
         {
             float sumnum = 0;
             int m = ssim_map.GetLength(0);
@@ -125,7 +125,7 @@ namespace FCN
             return sumnum / (m * n);
         }
 
-        internal static float[,] Pow(float[,] v1, int v2)
+        public static float[,] Pow(float[,] v1, int v2)
         {
             float[,] mu1 = new float[v1.GetLength(0), v1.GetLength(1)];
             for (var x = 0; x < v1.GetLength(0); x++)
@@ -140,7 +140,7 @@ namespace FCN
             return mu1;
         }
 
-        internal static float[] float2DTofloat1D(float[,] bvalue)
+        public static float[] float2DTofloat1D(float[,] bvalue)
         {
 
             var x = bvalue.GetLength(0);
@@ -155,7 +155,7 @@ namespace FCN
             return data;
         }
 
-        internal static float[][] ReLu(float[][] input, float Alpha)
+        public static float[][] ReLu(float[][] input, float Alpha)
         {
 
             float[][] temp = new float[input.GetLength(0)][];
@@ -170,7 +170,7 @@ namespace FCN
             }
             return temp;
         }
-        internal static dynamic init2Ddata(dynamic data,int value)
+        public static dynamic init2Ddata(dynamic data,int value)
         {
             float[][][,] gg;
             if (data is float[][][,])
@@ -205,7 +205,7 @@ namespace FCN
                 return data;
         }
 
-        internal static float[,] float1DTofloat2D(float[] aa, int w, int h)
+        public static float[,] float1DTofloat2D(float[] aa, int w, int h)
         {
             int len = aa.Length;
             float[,] data = new float[w, h];
@@ -219,7 +219,7 @@ namespace FCN
             return data;
         }
 
-        internal static dynamic zroe2D(params int[] length)
+        public static dynamic zroe2D(params int[] length)
         {
             dynamic data = null;
             if (length.Length == 1)
@@ -264,7 +264,7 @@ namespace FCN
             }
             return data;
         }
-        internal static dynamic zroe(params int[] length)
+        public static dynamic zroe(params int[] length)
         {
             dynamic data=null;
             if (length.Length == 1)
@@ -313,7 +313,7 @@ namespace FCN
             return data;
         }
 
-        internal static float[][] copy(float[][] prev_state)
+        public static float[][] copy(float[][] prev_state)
         {
             int len = prev_state.Length;
             float[][] data = new float[len][];
@@ -330,7 +330,7 @@ namespace FCN
             return data;
         }
 
-        internal static float[][] cat(float[][] input, float[][] prev_hidden, int index=0)
+        public static float[][] cat(float[][] input, float[][] prev_hidden, int index=0)
         {
             float[][] data;
             if (index == 0)
@@ -363,7 +363,7 @@ namespace FCN
             }
             return null;
         }
-        internal static float[][][,] cat(float[][][,] input, float[][][,] prev_hidden, int index = 0)
+        public static float[][][,] cat(float[][][,] input, float[][][,] prev_hidden, int index = 0)
         {
             float[][][,] data;
             if (index == 0)
@@ -406,7 +406,7 @@ namespace FCN
             return null;
         }
 
-        internal static float Max(float[] x)
+        public static float Max(float[] x)
         {
             int len = x.Length;
             float max = 0;
@@ -419,7 +419,7 @@ namespace FCN
             }
             return max;
         }
-        internal static float Max(float[,] x)
+        public static float Max(float[,] x)
         {
             int len = x.GetLength(0);
             int lenj = x.GetLength(1);
@@ -433,7 +433,7 @@ namespace FCN
             }
             return max;
         }
-        internal static float Max(float[][] x)
+        public static float Max(float[][] x)
         {
             int len = x.GetLength(0);
             int lenj = x[0].GetLength(0);
@@ -447,7 +447,7 @@ namespace FCN
             }
             return max;
         }
-        internal static float[,] ReLu( float[,] Ma, float Alpha)
+        public static float[,] ReLu( float[,] Ma, float Alpha)
         {
             int m = Ma.GetLength(0);
             int n = Ma.GetLength(1);
@@ -473,7 +473,7 @@ namespace FCN
          //   return (float)(Math.Abs(x) + x) / 2.0f; 
         
         }
-        internal static float[][][,] ReLu(float[][][,] input, float Alpha)
+        public static float[][][,] ReLu(float[][][,] input, float Alpha)
         {
             // x = (np.abs(x) + x) / 2.0
             float[][][,] temp = new float[input.GetLength(0)][][,];
@@ -499,7 +499,7 @@ namespace FCN
             return dot * (keepElements + (Alpha * (1 - keepElements)));
 
         }
-        internal static float[] ReLubackward(float[] Dx, float[] input, float F)
+        public static float[] ReLubackward(float[] Dx, float[] input, float F)
         {
 
             float[] temp = new float[input.GetLength(0)];
@@ -512,7 +512,7 @@ namespace FCN
             }
             return temp;
         }
-        internal static float[][] ReLubackward(float[][] Dx, float[][] input, float F)
+        public static float[][] ReLubackward(float[][] Dx, float[][] input, float F)
         {
 
             float[][] temp = new float[input.GetLength(0)][];
@@ -527,7 +527,7 @@ namespace FCN
             }
             return temp;
         }
-        internal static float[,] ReLubackward(float[,] Dx, float[,] Ma, float F)
+        public static float[,] ReLubackward(float[,] Dx, float[,] Ma, float F)
         {
             int m = Ma.GetLength(0);
             int n = Ma.GetLength(1);
@@ -543,7 +543,7 @@ namespace FCN
                     c[i, j] = ReLubackward(Dx[i,j],a[i, j],F);
             return c;
         }
-        internal static float[][][,] ReLubackward(float[][][,] Dx, float[][][,] input, float F)
+        public static float[][][,] ReLubackward(float[][][,] Dx, float[][][,] input, float F)
         {
             float[][][,] temp = new float[input.GetLength(0)][][,];
             for (var x = 0; x < input.GetLength(0); x++)
@@ -617,7 +617,7 @@ namespace FCN
             return convnValid(extendMatrix, kernel, 1, 0);
         }
 
-        internal static float[][] dot(float[][] left, float[][] right)
+        public static float[][] dot(float[][] left, float[][] right)
         {
 
 
@@ -643,7 +643,7 @@ namespace FCN
             return data;
         }
 
-        internal static float[][,] float1DTofloat3D(float[] gg,int w,int h,int channl)
+        public static float[][,] float1DTofloat3D(float[] gg,int w,int h,int channl)
         {
             float[][,] data = new float[channl][,];
             
@@ -663,7 +663,7 @@ namespace FCN
             return data;
         }
 
-        internal static float[] dot(float[] weights, float[] matrices)
+        public static float[] dot(float[] weights, float[] matrices)
         {
             float[] data = new float[weights.GetLength(0)];
             int lens = weights.GetLength(0);
@@ -678,7 +678,7 @@ namespace FCN
 
          
       
-        internal static Matrix[,] cat(Matrix[,] input, Matrix[,] prev_state,int  index)
+        public static Matrix[,] cat(Matrix[,] input, Matrix[,] prev_state,int  index)
         {
             Matrix[,] temp=null;
             if (index == 0) {
@@ -727,7 +727,7 @@ namespace FCN
 
         }
 
-        internal static Matrix[] dropout(Matrix[] input)
+        public static Matrix[] dropout(Matrix[] input)
         {
             Matrix[] temp = null;
 
@@ -764,7 +764,7 @@ namespace FCN
             return temp;
 
         }
-        internal static float[,] dropout( float[,] x, float level)
+        public static float[,] dropout( float[,] x, float level)
         {
             if (level < 0 || level >= 1)
             {
@@ -810,7 +810,7 @@ namespace FCN
                     ret[i][j] = (1.0f - p) * ret[i - 1][j] + p * ret[i - 1][j - 1];
             return ret[N][k];
         }
-        internal static float[][][,] activation_tanh(float[][][,] input)
+        public static float[][][,] activation_tanh(float[][][,] input)
         {
 
             float[][][,] temp = new float[input.GetLength(0)][][,];
@@ -826,7 +826,7 @@ namespace FCN
             }
             return temp;
         }
-        internal static Matrix[,] activation_tanh(Matrix[,] input)
+        public static Matrix[,] activation_tanh(Matrix[,] input)
         {
             for (var x = 0; x < input.GetLength(0); x++)
             {
@@ -837,7 +837,7 @@ namespace FCN
             }
             return input;
         }
-        internal static Matrix[] activation_tanh(Matrix[] input)
+        public static Matrix[] activation_tanh(Matrix[] input)
         {
             for (var x = 0; x < input.GetLength(0); x++)
             {
@@ -847,7 +847,7 @@ namespace FCN
             }
             return input;
         }
-        internal static float[] activation_tanh(float[] input)
+        public static float[] activation_tanh(float[] input)
         {
 
             float[] temp = new float[input.GetLength(0)];
@@ -860,7 +860,7 @@ namespace FCN
             }
             return temp;
         }
-        internal static float[][] activation_tanh(float[][] input)
+        public static float[][] activation_tanh(float[][] input)
         {
 
             float[][] temp = new float[input.GetLength(0)][];
@@ -900,7 +900,7 @@ namespace FCN
         {
             return 1 - x * x;
         }
-        internal static Matrix[,] activation_Sigma(Matrix[,] input)
+        public static Matrix[,] activation_Sigma(Matrix[,] input)
         {
 
             Matrix[,] temp = new Matrix[input.GetLength(0), input.GetLength(1)];
@@ -915,7 +915,7 @@ namespace FCN
             }
             return temp;
         }
-        internal static float[][][,] activation_Sigma(float[][][,] input)
+        public static float[][][,] activation_Sigma(float[][][,] input)
         {
 
             float[][][,] temp = new float[input.GetLength(0)][][,];
@@ -932,7 +932,7 @@ namespace FCN
             return temp;
         }
 
-        internal static float[] activation_Sigma(float[] input)
+        public static float[] activation_Sigma(float[] input)
         {
 
             float[] temp = new float[input.GetLength(0)];
@@ -945,7 +945,7 @@ namespace FCN
             }
             return temp;
         }
-        internal static float[][] activation_Sigma(float[][] input)
+        public static float[][] activation_Sigma(float[][] input)
         {
 
             float[][] temp = new float[input.GetLength(0)][];
@@ -960,7 +960,7 @@ namespace FCN
             }
             return temp;
         }
-        internal static Matrix[] activation_Sigma(Matrix[] input)
+        public static Matrix[] activation_Sigma(Matrix[] input)
         {
 
             Matrix[] temp = new Matrix[input.GetLength(0)];
@@ -974,7 +974,7 @@ namespace FCN
             }
             return temp;
         }
-        internal static List<float[][]> chunk(float[][] input, int count)
+        public static List<float[][]> chunk(float[][] input, int count)
         {
             int agvlen = input.Length / count;
             List<float[][]> list = new List<float[][]>();
@@ -996,7 +996,7 @@ namespace FCN
             return list;
 
         }
-        internal static List<float[][]> chunk(float[][] input, int count,int index)
+        public static List<float[][]> chunk(float[][] input, int count,int index)
         {
             if (index == 0)
             {
@@ -1032,7 +1032,7 @@ namespace FCN
             return null;
 
         }
-        internal static List<float[][][,]> chunk(float[][][,] input, int count,int index=0)
+        public static List<float[][][,]> chunk(float[][][,] input, int count,int index=0)
         {
 
             List<float[][][,]> list = new List<float[][][,]>();
@@ -1077,7 +1077,7 @@ namespace FCN
             }
             return list;
         }
-        internal static Matrix[][,] chunk(Matrix[,] input,int count,int index)
+        public static Matrix[][,] chunk(Matrix[,] input,int count,int index)
         {
             Matrix[][,] temp  =new Matrix[count][,] ;
             for (int x = 0; x < count; x++)
@@ -1114,7 +1114,7 @@ namespace FCN
 
         }
 
-        internal static float sum(Matrix matrix)
+        public static float sum(Matrix matrix)
         {
             float temp =0;
             for (var x = 0; x < matrix.values.GetLength(0); x++)
@@ -1127,7 +1127,7 @@ namespace FCN
             }
             return temp;
         }
-        internal static float sum(float[][] matrix)
+        public static float sum(float[][] matrix)
         {
             float temp = 0;
             for (var x = 0; x < matrix.GetLength(0); x++)
@@ -1140,7 +1140,7 @@ namespace FCN
             }
             return temp;
         }
-        internal static float sum(float[] matrix)
+        public static float sum(float[] matrix)
         {
             float temp = 0;
             for (var x = 0; x < matrix.GetLength(0); x++)
@@ -1151,7 +1151,7 @@ namespace FCN
             }
             return temp;
         }
-        internal unsafe static float sum(float[,] matrix)
+        public unsafe static float sum(float[,] matrix)
         {
             float temp = 0;
             int m = matrix.GetLength(0);
@@ -1925,7 +1925,7 @@ namespace FCN
                     c[i, j] = sigmod(a[i,j] + bias);
             return Mc;
         }
-        internal static Matrix[,] activation_Sigmabackward(Matrix[,] input, Matrix[,] dout)
+        public static Matrix[,] activation_Sigmabackward(Matrix[,] input, Matrix[,] dout)
         {
             Matrix[,] temp = new Matrix[input.GetLength(0), input.GetLength(1)];
             for (var x = 0; x < input.GetLength(0); x++)
@@ -1939,7 +1939,7 @@ namespace FCN
             }
             return temp;
         }
-        internal static float[][][,] activation_Sigmabackward(float[][][,] input, float[][][,] dout)
+        public static float[][][,] activation_Sigmabackward(float[][][,] input, float[][][,] dout)
         {
             float[][][,] temp = new float[input.GetLength(0)][][,];
             for (var x = 0; x < input.GetLength(0); x++)
@@ -1954,7 +1954,7 @@ namespace FCN
             }
             return temp;
         }
-        internal static Matrix[] activation_Sigmabackward(Matrix[] input, Matrix[] dout)
+        public static Matrix[] activation_Sigmabackward(Matrix[] input, Matrix[] dout)
         {
             Matrix[] temp = new Matrix[input.GetLength(0)];
             for (var x = 0; x < input.GetLength(0); x++)
@@ -2021,7 +2021,7 @@ namespace FCN
             }
             return Mc;
         }
-        internal static float[][][,] activation_tanhbackward(float[][][,] input, float[][][,] dout)
+        public static float[][][,] activation_tanhbackward(float[][][,] input, float[][][,] dout)
         {
             float[][][,] temp = new float[input.GetLength(0)][][,];
             for (var x = 0; x < input.GetLength(0); x++)
@@ -2082,7 +2082,7 @@ namespace FCN
             }
             return Mc;
         }
-        internal static Matrix[,] activation_tanhbackward(Matrix[,] input, Matrix[,] dout)
+        public static Matrix[,] activation_tanhbackward(Matrix[,] input, Matrix[,] dout)
         {
             Matrix[,] temp = new Matrix[input.GetLength(0), input.GetLength(1)];
              
@@ -2098,7 +2098,7 @@ namespace FCN
             
             return temp;
         }
-        internal static Matrix[] activation_tanhbackward(Matrix[] input, Matrix[] dout)
+        public static Matrix[] activation_tanhbackward(Matrix[] input, Matrix[] dout)
         {
             Matrix[] temp = new Matrix[input.GetLength(0)];
 

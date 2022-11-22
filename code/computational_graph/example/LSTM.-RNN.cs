@@ -316,8 +316,8 @@ namespace computational_graph.example
              hhweight = convLayerhh.backweight(da);
             return convLayerih.backward(da);
         }
-        float lr = 0.1f;
-        public void update()
+        
+        public void update(float lr = 0.1f)
         {
             convLayerih.weights = Matrix.MatrixSub(convLayerih.weights, Matrix.multiply(ihweight.grid, lr));
             convLayerih.basicData = Matrix.MatrixSub(convLayerih.basicData, Matrix.multiply(ihweight.basic, lr));

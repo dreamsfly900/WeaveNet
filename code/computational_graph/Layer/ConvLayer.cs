@@ -67,7 +67,7 @@ namespace computational_graph.Layer
             }
             return data;
         }
-
+        public dynamic gridd;
         public dynamic backweight(dynamic grid)
         {
              
@@ -90,7 +90,7 @@ namespace computational_graph.Layer
                     //outputB[s] = sum;
                 }
 
-                 var gridd = new { grid = Matrix.T(ss), basic = outputB };
+                 gridd = new { grid = Matrix.T(ss), basic = outputB };
                 gridK = gridd;
                 return gridd;
                    
