@@ -326,5 +326,26 @@ namespace computational_graph.example
             convLayerhh.basicData = Matrix.MatrixSub(convLayerhh.basicData, Matrix.multiply(hhweight.basic, lr));
 
         }
+        public void save(string file)
+        {
+            List<object> listwb = new List<object>();
+
+            listwb.Add(convLayerih.weights);
+            listwb.Add(convLayerih.basicData);
+            listwb.Add(convLayerhh.weights);
+            listwb.Add(convLayerhh.basicData);
+            string str = Newtonsoft.Json.JsonConvert.SerializeObject(listwb);
+            System.IO.StreamWriter sw = new System.IO.StreamWriter(file);
+            sw.Write(str);
+            sw.Close();
+        }
+        public void load(object[] v1)
+        {
+            convLayerih.weights = Newtonsoft.Json.JsonConvert.DeserializeObject<float[][]>(v1[0].ToString());
+            convLayerih.basicData = Newtonsoft.Json.JsonConvert.DeserializeObject<float[]>(v1[1].ToString());
+            convLayerhh.weights = Newtonsoft.Json.JsonConvert.DeserializeObject<float[][]>(v1[2].ToString());
+            convLayerhh.basicData = Newtonsoft.Json.JsonConvert.DeserializeObject<float[]>(v1[3].ToString());
+
+        }
     }
 }
