@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30114.128
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32804.467
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "Pythontest", "Pythontest\Pythontest.pyproj", "{76B74575-243D-44BD-AD9A-00C1DD311DCC}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CUDA", "CUDA\CUDA.vcxproj", "{737231DE-CA9D-45D1-9695-B7EB4DCB49DA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "computational_graph", "computational_graph\computational_graph.csproj", "{FAD7D210-B5DE-4D39-BC12-39DEC6963922}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "computational_graph_core", "computational_graph_core\computational_graph_core.csproj", "{CE7464CB-71AA-4493-BC8A-6CDC691F435A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,6 +63,18 @@ Global
 		{FAD7D210-B5DE-4D39-BC12-39DEC6963922}.Release|x64.Build.0 = Release|Any CPU
 		{FAD7D210-B5DE-4D39-BC12-39DEC6963922}.Release|x86.ActiveCfg = Release|Any CPU
 		{FAD7D210-B5DE-4D39-BC12-39DEC6963922}.Release|x86.Build.0 = Release|Any CPU
+		{CE7464CB-71AA-4493-BC8A-6CDC691F435A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE7464CB-71AA-4493-BC8A-6CDC691F435A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE7464CB-71AA-4493-BC8A-6CDC691F435A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CE7464CB-71AA-4493-BC8A-6CDC691F435A}.Debug|x64.Build.0 = Debug|Any CPU
+		{CE7464CB-71AA-4493-BC8A-6CDC691F435A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CE7464CB-71AA-4493-BC8A-6CDC691F435A}.Debug|x86.Build.0 = Debug|Any CPU
+		{CE7464CB-71AA-4493-BC8A-6CDC691F435A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE7464CB-71AA-4493-BC8A-6CDC691F435A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE7464CB-71AA-4493-BC8A-6CDC691F435A}.Release|x64.ActiveCfg = Release|Any CPU
+		{CE7464CB-71AA-4493-BC8A-6CDC691F435A}.Release|x64.Build.0 = Release|Any CPU
+		{CE7464CB-71AA-4493-BC8A-6CDC691F435A}.Release|x86.ActiveCfg = Release|Any CPU
+		{CE7464CB-71AA-4493-BC8A-6CDC691F435A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
