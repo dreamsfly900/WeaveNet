@@ -235,14 +235,14 @@ namespace computational_graph.example
         ConvLayer convLayerih;
         ConvLayer convLayerhh;
         int input_size; int hidden_size;
-        public LSTMCELL(int _input_size, int _hidden_size)
+        public LSTMCELL(int _input_size, int _hidden_size, bool initw = true)
         {
             input_size = _input_size;
             hidden_size = _hidden_size;
-            convLayerih = new ConvLayer(input_size, hidden_size * 4 );
+            convLayerih = new ConvLayer(input_size, hidden_size * 4 , initw);
             //convLayerih.weights = JsonConvert.DeserializeObject<float[][]>(util.getstr("D:\\lstmihw.json"));
             //convLayerih.basicData = JsonConvert.DeserializeObject<float[]>(util.getstr("D:\\lstmihb.json"));
-            convLayerhh = new ConvLayer( hidden_size, hidden_size * 4);
+            convLayerhh = new ConvLayer( hidden_size, hidden_size * 4, initw);
             //convLayerhh.weights = JsonConvert.DeserializeObject<float[][]>(util.getstr("D:\\lstmhhw.json"));
             //convLayerhh.basicData = JsonConvert.DeserializeObject<float[]>(util.getstr("D:\\lstmhhb.json"));
         }
