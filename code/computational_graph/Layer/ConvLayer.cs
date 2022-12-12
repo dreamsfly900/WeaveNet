@@ -102,9 +102,11 @@ namespace computational_graph.Layer
                 var gridss = Matrix.T(grid);
                 if (full)
                 {
-                    float[][] data = new float[inChannels][];
 
-                    for (int i = 0; i < inChannels; i++)
+                    int lens = inputDatamatrices.Length;
+                    float[][] data = new float[lens][];
+
+                    for (int i = 0; i < lens; i++)
                     {
                         data[i] = new float[outChannels];
                         for (int j = 0; j < outChannels; j++)
