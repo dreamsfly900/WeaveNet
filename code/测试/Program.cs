@@ -10,12 +10,13 @@ namespace 测试
     {
         static void Main(string[] args)
         {
-             ConvLayer cl2 = new ConvLayer(3, outnum: 2, true,true);
+             ConvLayer cl2 = new ConvLayer(3, outnum: 5, true,true);
             var x_data = new float[3][];
             x_data[0] = new float[] { 0f, 1f, 2f };
             x_data[1] = new float[] { 3f, 4f, 5f };
             x_data[2] = new float[] { 6f, 7f,8f };
             var grid=cl2.Forward(x_data);
+            cl2.backweight(grid);
              cl2.backward(grid);
         }
     }

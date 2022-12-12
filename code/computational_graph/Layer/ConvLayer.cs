@@ -9,7 +9,7 @@ using System.Xml.Linq;
 
 namespace computational_graph.Layer
 {
-   public class ConvLayer
+    public class ConvLayer
     {
         public int inChannels;   //输入图像的数目
         public int outChannels;  //输出图像的数目
@@ -21,16 +21,16 @@ namespace computational_graph.Layer
         public float[][] weights;
 
         public float[] basicData;
-        bool full=false;
-        public ConvLayer(int innum = 1, int outnum = 6, bool initW = true,bool _full=false)
+        bool full = false;
+        public ConvLayer(int innum = 1, int outnum = 6, bool initW = true, bool _full = false)
         {
             full = _full;
             inChannels = innum;
             outChannels = outnum;
             if (initW)
             {
-               
-                    weights = util.initweights(innum, outnum);
+
+                weights = util.initweights(innum, outnum);
             }
 
             basicData = new float[outnum];
@@ -42,16 +42,17 @@ namespace computational_graph.Layer
             }
         }
         dynamic inputDatamatrices;
-        
+
         public dynamic Forward(dynamic matrices)
         {
             //if(matrices is float[,])
             //    matrices 
 
             inputDatamatrices = matrices;
-          
+
             var inputDatamatrices2 = conv(matrices);
-            if (full) {
+            if (full)
+            {
                 float[][] data = new float[1][];
                 data[0] = new float[outChannels];
                 float[][] aa = inputDatamatrices2;
@@ -64,12 +65,12 @@ namespace computational_graph.Layer
                 return data;
             }
             else
-            return inputDatamatrices2;
+                return inputDatamatrices2;
 
         }
 
-      
-     
+
+
         public void update(float lr = 0.1f)
         {
 
@@ -86,7 +87,7 @@ namespace computational_graph.Layer
             data = Matrix.dot(matrices, weights);
             for (var i = 0; i < (matrices.Length); i++)
             {
-                
+
                 for (var j = 0; j < (outChannels); j++)
                     data[i][j] += basicData[j];
             }
@@ -95,32 +96,34 @@ namespace computational_graph.Layer
         public dynamic gridd;
         public dynamic backweight(dynamic grid)
         {
-             
+
             if (grid is float[][])
             {
+                var gridss = Matrix.T(grid);
                 if (full)
                 {
                     float[][] data = new float[inChannels][];
-                    
+
                     for (int i = 0; i < inChannels; i++)
                     {
                         data[i] = new float[outChannels];
                         for (int j = 0; j < outChannels; j++)
                             data[i][j] = grid[0][j];
                     }
-                    grid = data;
+
+                    gridss = Matrix.T(data);
                 }
 
-                    //  var   weightst = Matrix.T(weights);
-                    //var ss = Matrix.dot(grid, weightst);
-                    var gridss = Matrix.T(grid);
-                var ss= Matrix.dot(gridss, inputDatamatrices );
-              
+                //  var   weightst = Matrix.T(weights);
+                //var ss = Matrix.dot(grid, weightst);
+
+                var ss = Matrix.dot(gridss, inputDatamatrices);
+
                 float[] outputB = new float[outChannels];
 
                 for (var s = 0; s < outChannels; s++)
                 {
-                    
+
 
                     float sum = Matrix.sum(gridss[s]);
 
@@ -128,11 +131,11 @@ namespace computational_graph.Layer
                     //outputB[s] = sum;
                 }
 
-                 gridd = new { grid = Matrix.T(ss), basic = outputB };
+                gridd = new { grid = Matrix.T(ss), basic = outputB };
                 gridK = gridd;
                 return gridd;
-                   
-               
+
+
             }
             return grid;
         }
@@ -142,9 +145,10 @@ namespace computational_graph.Layer
 
             if (grid is float[][])
             {
+                var data = grid;
                 if (full)
                 {
-                    float[][] data = new float[inChannels][];
+                    data = new float[inChannels][];
 
                     for (int i = 0; i < inChannels; i++)
                     {
@@ -152,11 +156,11 @@ namespace computational_graph.Layer
                         for (int j = 0; j < outChannels; j++)
                             data[i][j] = grid[0][j];
                     }
-                    grid = data;
+
                 }
-                var   weightst = Matrix.T(weights);
-                var ss = Matrix.dot(grid, weightst);
-               
+                var weightst = Matrix.T(weights);
+                var ss = Matrix.dot(data, weightst);
+
                 return ss;
 
 

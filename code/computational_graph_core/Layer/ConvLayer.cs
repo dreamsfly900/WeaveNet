@@ -98,6 +98,7 @@ namespace computational_graph.Layer
              
             if (grid is float[][])
             {
+                var gridss = Matrix.T(grid);
                 if (full)
                 {
                     float[][] data = new float[inChannels][];
@@ -108,12 +109,13 @@ namespace computational_graph.Layer
                         for (int j = 0; j < outChannels; j++)
                             data[i][j] = grid[0][j];
                     }
-                    grid = data;
+                   
+                    gridss = Matrix.T(data);
                 }
 
                     //  var   weightst = Matrix.T(weights);
                     //var ss = Matrix.dot(grid, weightst);
-                    var gridss = Matrix.T(grid);
+                   
                 var ss= Matrix.dot(gridss, inputDatamatrices );
               
                 float[] outputB = new float[outChannels];
@@ -142,9 +144,10 @@ namespace computational_graph.Layer
 
             if (grid is float[][])
             {
+                var data = grid;
                 if (full)
                 {
-                    float[][] data = new float[inChannels][];
+                   data = new float[inChannels][];
 
                     for (int i = 0; i < inChannels; i++)
                     {
@@ -152,10 +155,10 @@ namespace computational_graph.Layer
                         for (int j = 0; j < outChannels; j++)
                             data[i][j] = grid[0][j];
                     }
-                    grid = data;
+                    
                 }
                 var   weightst = Matrix.T(weights);
-                var ss = Matrix.dot(grid, weightst);
+                var ss = Matrix.dot(data, weightst);
                
                 return ss;
 
