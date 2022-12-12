@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace computational_graph.Layer
 {
@@ -20,13 +21,17 @@ namespace computational_graph.Layer
         public float[][] weights;
 
         public float[] basicData;
-        public ConvLayer(int innum = 1, int outnum = 6, bool initW = true)
+        bool full=false;
+        public ConvLayer(int innum = 1, int outnum = 6, bool initW = true,bool _full=false)
         {
-
+            full = _full;
             inChannels = innum;
             outChannels = outnum;
             if (initW)
-                weights = util.initweights(innum, outnum);
+            {
+               
+                    weights = util.initweights(innum, outnum);
+            }
 
             basicData = new float[outnum];
             if (initW)
@@ -37,14 +42,34 @@ namespace computational_graph.Layer
             }
         }
         dynamic inputDatamatrices;
+        
         public dynamic Forward(dynamic matrices)
         {
             //if(matrices is float[,])
             //    matrices 
+
             inputDatamatrices = matrices;
-           var inputDatamatrices2 = conv(matrices);
+          
+            var inputDatamatrices2 = conv(matrices);
+            if (full) {
+                float[][] data = new float[1][];
+                data[0] = new float[outChannels];
+                float[][] aa = inputDatamatrices2;
+                for (var i = 0; i < aa.Length; i++)
+                {
+                    for (var j = 0; j < outChannels; j++)
+                        data[0][j] += aa[i][j];
+                }
+
+                return data;
+            }
+            else
             return inputDatamatrices2;
+
         }
+
+      
+     
         public void update(float lr = 0.1f)
         {
 
@@ -73,9 +98,22 @@ namespace computational_graph.Layer
              
             if (grid is float[][])
             {
-                //  var   weightst = Matrix.T(weights);
-                //var ss = Matrix.dot(grid, weightst);
-                var gridss = Matrix.T(grid);
+                if (full)
+                {
+                    float[][] data = new float[inChannels][];
+                    
+                    for (int i = 0; i < inChannels; i++)
+                    {
+                        data[i] = new float[outChannels];
+                        for (int j = 0; j < outChannels; j++)
+                            data[i][j] = grid[0][j];
+                    }
+                    grid = data;
+                }
+
+                    //  var   weightst = Matrix.T(weights);
+                    //var ss = Matrix.dot(grid, weightst);
+                    var gridss = Matrix.T(grid);
                 var ss= Matrix.dot(gridss, inputDatamatrices );
               
                 float[] outputB = new float[outChannels];
@@ -104,7 +142,19 @@ namespace computational_graph.Layer
 
             if (grid is float[][])
             {
-               var   weightst = Matrix.T(weights);
+                if (full)
+                {
+                    float[][] data = new float[inChannels][];
+
+                    for (int i = 0; i < inChannels; i++)
+                    {
+                        data[i] = new float[outChannels];
+                        for (int j = 0; j < outChannels; j++)
+                            data[i][j] = grid[0][j];
+                    }
+                    grid = data;
+                }
+                var   weightst = Matrix.T(weights);
                 var ss = Matrix.dot(grid, weightst);
                
                 return ss;
