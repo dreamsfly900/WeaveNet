@@ -1,9 +1,4 @@
-﻿using System;
-using System.Xml.Linq;
-using computational_graph;
-using computational_graph.example;
-using computational_graph.Layer;
-using computational_graph.loss;
+﻿using computational_graph.Layer;
 namespace 测试
 {
     internal class Program
