@@ -14,6 +14,9 @@
 池化支持：平均池化，最大池化
 其他支持：ConvLayer，Conv2DLayer，MulLayer,ConvTranspose2DLayer</Description>
     <PackageProjectUrl>https://gitee.com/UDCS/WeaveAI</PackageProjectUrl>
+    <PackageId>WeaveAI</PackageId>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://gitee.com/UDCS/WeaveAI.git</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
