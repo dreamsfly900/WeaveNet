@@ -2,6 +2,7 @@
 using FCN;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -155,7 +156,7 @@ namespace computational_graph.Layer
                     {
                         data[i] = new float[outChannels];
                         for (int j = 0; j < outChannels; j++)
-                            data[i][j] = grid[0][j];
+                            data[i][j] = grid[0][j] ;
                     }
                     
                 }
