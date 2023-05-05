@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FCN;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -38,6 +39,33 @@ namespace computational_graph.Util
 
             return (float)(num / den);
 
+        }
+        /// <summary>
+        /// TCC 时间关系相关系数
+        /// </summary>
+        /// <param name="data1"></param>
+        /// <param name="data2"></param>
+        /// <returns></returns>
+        public static float Temporal_Correlation_Coefficient(float[] data1, float[] data2)
+        {
+            data1 = Matrix.diff(data1);
+            data2 = Matrix.diff(data2);
+            var a = Matrix.multiply(data1, data2);
+            var tcc = Matrix.sum(a) / (Math.Sqrt(Matrix.sum(Matrix.pow(data1, 2))) * Math.Sqrt(Matrix.sum(Matrix.pow(data2, 2))));
+            return (float)tcc;
+        }
+        /// <summary>
+        /// 纳什效率系数（水文验证）
+        /// </summary>
+        /// <param name="data1">观测</param>
+        /// <param name="data2">模拟</param>
+        /// <returns></returns>
+        public static float NSE(float[] data1, float[] data2)
+        {
+            var sum1= Matrix.sum(  Matrix.pow(Matrix.MatrixSub( data1, data2), 2));
+            var sumavg = Matrix.sum(data2) / data2.Length;
+            var sum2 = Matrix.sum(Matrix.pow(Matrix.MatrixSub(data1, sumavg), 2));
+            return (float)1-(sum1/sum2);
         }
     }
 }

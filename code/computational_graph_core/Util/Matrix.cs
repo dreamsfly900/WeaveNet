@@ -1505,6 +1505,21 @@ namespace FCN
             }
             return mc;
         }
+        public static float[] MatrixSub(float[] ma, float mb)
+        {
+
+            int m = ma.GetLength(0);
+
+            float[] mc = new float[m];
+            for (int i = 0; i < m; i++)
+            {
+
+               
+                mc[i] = (ma[i] - mb);
+
+            }
+            return mc;
+        }
         public static float[][] MatrixSub(float[][] ma, float[][] mb)
         {
 
@@ -2869,7 +2884,7 @@ namespace FCN
             return x;
         }
         /// <summary>
-        /// 追个向后减
+        /// 追个后2减前1
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
@@ -2878,7 +2893,7 @@ namespace FCN
             float[] result = new float[data.Length-1];
             for (int i = 0; i < data.Length - 1; i++)
             {
-                result[i] = data[i]- data[i+1];
+                result[i] = data[i + 1]-data[i] ;
             }
             return result;
         }
