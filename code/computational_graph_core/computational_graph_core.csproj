@@ -6,7 +6,7 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>深度学习网络计算图</Title>
-    <Version>23.4.26</Version>
+    <Version>23.4.27</Version>
     <Authors>葛杰</Authors>
     <Description>LOSS支持：MESLOSS,cross-entropy
 激活函数支持：ReLu，Tanh，Sigmod，Softmax
@@ -17,6 +17,14 @@
     <PackageId>WeaveAI</PackageId>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://gitee.com/UDCS/WeaveAI.git</RepositoryUrl>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <Optimize>False</Optimize>
   </PropertyGroup>
 
   <ItemGroup>

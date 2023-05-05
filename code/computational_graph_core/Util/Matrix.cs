@@ -2868,6 +2868,47 @@ namespace FCN
             if (x > 1.0) return 1.0f;
             return x;
         }
-        
+        /// <summary>
+        /// 追个向后减
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static float[] diff(float[] data)
+        {
+            float[] result = new float[data.Length-1];
+            for (int i = 0; i < data.Length - 1; i++)
+            {
+                result[i] = data[i]- data[i+1];
+            }
+            return result;
+        }
+        public static float[] pow(float[] a, float b)
+        {
+            int hang = a.GetLength(0);
+
+            float[] result = new float[hang];
+            for (int i = 0; i < hang; i++)
+            {
+
+
+                result[i] =(float) Math.Pow( a[i] , b);
+
+            }
+            return result;
+        }
+        public static float[] sqrt(float[] a)
+        {
+            int hang = a.GetLength(0);
+
+            float[] result = new float[hang];
+            for (int i = 0; i < hang; i++)
+            {
+
+
+                result[i] = (float)Math.Sqrt(a[i]);
+
+            }
+            return result;
+        }
     }
 }
