@@ -2225,7 +2225,7 @@ namespace FCN
             }
             return result;
         }
-        public unsafe static float[,] divide(float[,] a, float[,] b)
+        public unsafe static float[,] unsafedivide(float[,] a, float[,] b)
         {
             int hang = a.GetLength(0);
             int lie = a.GetLength(1);
@@ -2243,6 +2243,22 @@ namespace FCN
                     }
                 }
             }
+            return result;
+        }
+        public unsafe static float[,] divide(float[,] a, float[,] b)
+        {
+            int hang = a.GetLength(0);
+            int lie = a.GetLength(1);
+            float[,] result = new float[hang, lie];
+            
+                    for (int i = 0; i < hang; i++)
+                    {
+                        for (int j = 0; j < lie; j++)
+                        {
+                            result[i, j] = a[i,j] / b[i,j];
+                        }
+                    }
+            
             return result;
         }
         public static float[][] divide(float[][] a, float b)

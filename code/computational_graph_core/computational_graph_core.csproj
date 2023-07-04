@@ -6,7 +6,7 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>深度学习网络计算图</Title>
-    <Version>23.7.4</Version>
+    <Version>23.7.4-2</Version>
     <Authors>葛杰</Authors>
     <Description>LOSS支持：MESLOSS,cross-entropy
 激活函数支持：ReLu，Tanh，Sigmod，Softmax
