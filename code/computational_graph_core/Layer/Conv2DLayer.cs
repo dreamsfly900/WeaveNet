@@ -298,7 +298,7 @@ namespace computational_graph.Layer
                                 v1 = Matrix.convnValid(inputDatamatrices[cc][j], grid[cc][i], stride, padding);
                                 // v1 = Matrix.convolution(inputDatamatrices[cc][j], grid[cc][i], stride, padding);
                                 if (outputData[i][j] != null)
-                                    outputData[i][j] = Matrix.MatrixAdd(outputData[i][j], v1).values;
+                                    outputData[i][j] = Matrix.MatrixAdd(outputData[i][j], v1);
                                 else
                                     outputData[i][j] = v1;
 
@@ -396,7 +396,7 @@ namespace computational_graph.Layer
 
 
                             if (outputData[cc][i] != null)
-                                outputData[cc][i] = Matrix.MatrixAdd(outputData[cc][i], v1).values;
+                                outputData[cc][i] = Matrix.MatrixAdd(outputData[cc][i], v1);
                             else
                                 outputData[cc][i] = v1;
 
@@ -473,7 +473,7 @@ namespace computational_graph.Layer
                             // temp = Matrix.convolution(inputData[cc][j], weights[i][j], stride, padding);
                             if (v1 == null)
                                 v1 = new float[temp.GetLength(0), temp.GetLength(1)];
-                            v1 = Matrix.MatrixAdd(v1, temp).values;
+                            v1 = Matrix.MatrixAdd(v1, temp);
                             //temp = inputData[j].convolution(C1.weights[j, i].values, C1.stride, C1.padding);//向前传播 
                             outputData[cc][i] = v1;
                             // });

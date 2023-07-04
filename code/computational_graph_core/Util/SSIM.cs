@@ -75,8 +75,8 @@ namespace computational_graph.Util
             var mu12sq = Matrix.MAdd(Matrix.multiply(sigma12, 2), (float)C2);
             var mu12sq_12= Matrix.multiply(mu12, mu12sq);
 
-            var musq12=  Matrix.MAdd(Matrix.MatrixAdd(mu1_sq, mu2_sq).values, (float)C1);
-            var mu12sq12 = Matrix.MAdd(Matrix.MatrixAdd(sigma1_sq, sigma2_sq).values, (float)C2);
+            var musq12=  Matrix.MAdd(Matrix.MatrixAdd(mu1_sq, mu2_sq), (float)C1);
+            var mu12sq12 = Matrix.MAdd(Matrix.MatrixAdd(sigma1_sq, sigma2_sq), (float)C2);
             var mu12sq_12aq = Matrix.multiply(musq12, mu12sq12);
             var ssim_map=  Matrix.divide(mu12sq_12 ,mu12sq_12aq);
             if (this.size_average)

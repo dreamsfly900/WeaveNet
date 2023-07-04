@@ -1725,7 +1725,7 @@ namespace FCN
             for (var x = 0; x < input.GetLength(0); x++)
             {
 
-                input[x] = MatrixAdd(Ma[x].values, Mb[x].values);
+                input[x] = unsafeMatrixAdd(Ma[x].values, Mb[x].values);
 
             }
             return input;
@@ -1764,7 +1764,7 @@ namespace FCN
                 for (var y = 0; y < input[x].GetLength(0); y++)
                 {
 
-                    input[x][y] = MatrixAdd(Ma[x][y], Mb[x][y]).values;
+                    input[x][y] = MatrixAdd(Ma[x][y], Mb[x][y]);
                 }
             }
             return input;
@@ -1778,7 +1778,7 @@ namespace FCN
                 input[x] = new float[Ma[x].GetLength(0), Ma[x].GetLength(1)];
                
 
-                    input[x] = MatrixAdd(Ma[x], Mb[x]).values;
+                    input[x] = MatrixAdd(Ma[x], Mb[x]);
                 
             }
             return input;
@@ -1834,7 +1834,32 @@ namespace FCN
                     c[i, j] =Math.Max( a[i, j] ,b[i, j]) ;
             return Mc;
         }
-        public unsafe static Matrix MatrixAdd(float[,] Ma, float[,] Mb,float bias=0)
+        public  static float[,] MatrixAdd(float[,] Ma, float[,] Mb, float bias = 0)
+        {
+
+            int m = Ma.GetLength(0);
+            int n = Ma.GetLength(1);
+            int m2 = Mb.GetLength(0);
+            int n2 = Mb.GetLength(1);
+
+            if ((m != m2) || (n != n2))
+            {
+                Exception myException = new Exception("数组维数不匹配");
+                throw myException;
+            }
+
+            float[,] Mc = new float[m, n];
+       
+            //float[,] a = Ma;
+            //float[,] b = Mb;
+           
+                    for (int i = 0; i < m; i++)
+                        for (int j = 0; j < n; j++)
+                    Mc[i, j] = Ma[i,j] + Mb[i,j] + bias;
+            
+            return Mc;
+        }
+        public unsafe static Matrix unsafeMatrixAdd(float[,] Ma, float[,] Mb,float bias=0)
         {
            
             int m = Ma.GetLength(0);
@@ -2337,7 +2362,7 @@ namespace FCN
                 for (var y = 0; y < input.GetLength(1); y++)
                 {
                     
-                    input[x, y] = MatrixAdd(Ma[x, y].values, Mb[x, y].values);
+                    input[x, y] = unsafeMatrixAdd(Ma[x, y].values, Mb[x, y].values);
                 }
             }
             return input;
