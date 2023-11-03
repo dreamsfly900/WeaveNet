@@ -5,13 +5,14 @@ using FCN;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace computational_graph
 {
-    class BPTest
+ public   class BPTest
     {
         static void Main(string[] args)
         {
@@ -25,11 +26,14 @@ namespace computational_graph
         /// <summary>
         /// BP网络测试
         /// </summary>
-        static void BP()
+     public   static void BP()
         {
-            float[][] x = JsonConvert.DeserializeObject<float[][]>(util.getstr("D:\\bpx.json"));//训练数据
-            float[][] y = JsonConvert.DeserializeObject<float[][]>(util.getstr("D:\\bpy.json"));//训练标签
-            float[][] w1 = JsonConvert.DeserializeObject<float[][]>(util.getstr("D:\\bpw.json"));
+            String path = AppDomain.CurrentDomain.BaseDirectory;
+            float[][] x = JsonConvert.DeserializeObject<float[][]>(util.getstr(Path.Combine(path, "bpx.json")));//训练数据
+            float[][] y = JsonConvert.DeserializeObject<float[][]>(util.getstr(Path.Combine(path, "bpy.json")));//训练标签
+            float[][] w1 = JsonConvert.DeserializeObject<float[][]>(util.getstr(Path.Combine(path, "bpw.json")));
+
+           
 
 
             ConvLayer cl1 = new ConvLayer(13, 5, true);
@@ -99,7 +103,9 @@ namespace computational_graph
             ff2 = sl.Forward(ff2);
             ff2 = cl2.Forward(ff2);
 
+            Console.WriteLine("预测数据：");
             util.prirt(ff2);
+            Console.WriteLine("期望数据：");
             util.prirt(y[aa]);
         }
      
